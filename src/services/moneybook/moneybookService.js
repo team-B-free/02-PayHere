@@ -1,9 +1,6 @@
 import Moneybook from "../../models/moneybook.js";
 
 const moneybookService = {
-  readAllMoneybook: (req, res) => {
-    return res.send("hi");
-  },
   updateMoneybook: async (req) => {
     /**
      * @author 오주환

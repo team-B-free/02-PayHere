@@ -4,16 +4,15 @@ const router = Router();
 
 router.post("/signup", userController.signupUser);
 
-//인증 필요(미들웨어 사용)
 /**
  * @author 오주환
  * @version 1.0 22.07.06 가계부 생성
  */
-router.post("/moneybook", userController.createMoneybook);
+router.post("/moneybooks", userController.createMoneybook);
 /**
  * @author 오주환
- * @version 1.0 22.07.06 가계부 상세조회
+ * @version 1.0 22.07.06 모든 가계부 조회(제목)
  */
-router.get("/moneybook", userController.readAllMoneybook);
+router.get("/moneybooks", userController.readAllMoneybookByDate);
 
 export default router;

@@ -1,11 +1,11 @@
 import dotenv from "dotenv";
 dotenv.config();
 
-import Sequelize from 'sequelize';
-import MoneybookDetail from './moneybookDetail.js';
-import Moneybook from './moneybook.js';
-import User from './user.js';
-import Comment from './comment.js';
+import Sequelize from "sequelize";
+import MoneybookDetail from "./moneybookDetail.js";
+import Moneybook from "./moneybook.js";
+import User from "./user.js";
+import Comment from "./comment.js";
 
 const sequelize = new Sequelize(
   process.env.DB_NAME,
@@ -14,6 +14,7 @@ const sequelize = new Sequelize(
   {
     host: process.env.DB_HOST,
     dialect: process.env.DB_DIALECT,
+    timezone: process.env.DB_TIMEZONE,
   }
 );
 
