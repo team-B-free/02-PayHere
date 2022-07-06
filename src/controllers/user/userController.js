@@ -8,7 +8,6 @@ const userController = {
     try {
       const user = await userService.signupUser(req);
 
-      console.log(user);
       return res
         .status(statusCode.CREATED)
         .send(response(statusCode.CREATED, message.SUCCESS, user));
@@ -21,14 +20,11 @@ const userController = {
   readAllMoneybookByDate: async (req, res) => {
     /**
      * @author 오주환
-     * @version 1.0 22.07.07 가계부 조회(날짜) 생성
+     * @version 1.0 22.07.07 가계부 조회(날짜 조건)
      */
     // 1.미들웨어 토큰 정보
     // const userInfo = req.userInfo;
     // 2.Header 토큰 정보
-
-    console.log(req.query);
-
     const moneybook = await userService.readAllMoneybookByDate(req);
 
     try {
@@ -52,13 +48,10 @@ const userController = {
         .send(errResponse(statusCode.BAD_REQUEST, message.BAD_REQUEST));
     }
   },
-  readMoneybooks: (req, res) => {
-    return res.send("hi");
-  },
   createMoneybook: async (req, res) => {
     /**
      * @author 오주환
-     * @version 1.0 22.07.06 가계부 생성
+     * @version 1.0 22.07.06 가계부 추가
      */
 
     try {
@@ -68,6 +61,10 @@ const userController = {
         return res
           .status(statusCode.UNAUTHORIZED)
           .send(errResponse(statusCode.UNAUTHORIZED, message.NULL_VALUE));
+      }
+
+      if (moneybook === undefined) {
+        return res.send(errResponse(statusCode.NO_CONTENT, message.NULL_VALUE));
       }
 
       return res

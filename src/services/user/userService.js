@@ -37,7 +37,7 @@ const userService = {
       return 0;
     } else {
       const result = Moneybook.sequelize.query(
-        `SELECT id, title, is_shared, view, created_at FROM moneybook WHERE user_id=4 AND created_at >= '${startDate}' AND created_at <= '${endDate}';`,
+        `SELECT id, title, is_shared, view, created_at FROM moneybook WHERE user_id=2 AND created_at >= '${startDate}' AND created_at <= '${endDate}' ORDER BY created_at DESC;`,
         { model: Moneybook }
       );
 
@@ -54,8 +54,6 @@ const userService = {
     // 2.Header 토큰 정보
     const authorization = req.header("Authorization");
 
-    console.log(authorization);
-
     if (authorization === undefined) {
       return 0;
     }
@@ -66,7 +64,7 @@ const userService = {
         title,
         is_shared,
         view,
-        user_id: 2,
+        user_id: 1,
       });
       return moneybook;
     } catch (error) {

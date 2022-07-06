@@ -16,10 +16,6 @@ class MoneybookDetail extends Model {
           type: DataTypes.INTEGER,
           allowNull: false,
         },
-        occured_at: {
-          type: DataTypes.DATE,
-          allowNull: false,
-        },
       },
       {
         sequelize,

@@ -17,22 +17,18 @@ const moneybookService = {
       return 0;
     }
 
-    try {
-      const moneybook = await Moneybook.update(
-        {
-          title,
-          is_shared,
-        },
-        {
-          where: { id: moneybook_idx },
-        }
-      );
-      return moneybook;
-    } catch (err) {
-      console.error(err);
-    }
-
-    return moneybook_idx;
+    const moneybook = await Moneybook.update(
+      {
+        title,
+        is_shared,
+      },
+      {
+        where: { id: moneybook_idx },
+      }
+    ).catch(() => {
+      return -1;
+    });
+    return moneybook;
   },
 };
 

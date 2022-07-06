@@ -11,7 +11,7 @@ router.post("/signup", userController.signupUser);
 router.post("/moneybooks", userController.createMoneybook);
 /**
  * @author 오주환
- * @version 1.0 22.07.06 모든 가계부 조회(제목)
+ * @version 1.0 22.07.06 가계부 조회(날짜)
  */
 router.get("/moneybooks", userController.readAllMoneybookByDate);
 
