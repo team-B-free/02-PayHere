@@ -30,6 +30,12 @@ const userController = {
     try {
       const moneybook = await userService.createMoneybook(req);
 
+      if (moneybook === 0) {
+        return res
+          .status(statusCode.UNAUTHORIZED)
+          .send(errResponse(statusCode.UNAUTHORIZED, message.NULL_VALUE));
+      }
+
       return res
         .status(statusCode.CREATED)
         .send(response(statusCode.CREATED, message.SUCCESS, moneybook));

@@ -24,8 +24,15 @@ const userService = {
      * @author 오주환
      * @version 1.0 22.07.06 가계부 생성
      */
-    // 토큰 인증 정보
+    // 1.미들웨어 토큰 정보
     // const userInfo = req.userInfo;
+    // 2.Header 토큰 정보
+    const authorization = req.header("Authorization");
+
+    if (authorization === undefined) {
+      return 0;
+    }
+
     const { title, is_shared, view } = req.body;
     try {
       const moneybook = await Moneybook.create({
