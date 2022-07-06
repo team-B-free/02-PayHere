@@ -1,5 +1,6 @@
 import MoneybookDetail from "../../models/moneybookDetail.js";
 import Moneybook from "../../models/moneybook.js";
+import { getCurrentTime } from "../../modules/time.js";
 
 const moneybookDetailService = {
   createMoneybook: async (req) => {
@@ -73,7 +74,7 @@ const moneybookDetailService = {
     const authorization = req.header("Authorization");
 
     if (authorization === undefined) {
-      return -1;
+      return 0;
     }
 
     const moneybook = await MoneybookDetail.update(
@@ -89,8 +90,33 @@ const moneybookDetailService = {
 
     return moneybook;
   },
-  deleteMoneybook: (req, res) => {},
-  recoverMoneybook: (req, res) => {},
+  deleteMoneybook: async (req) => {
+    /**
+     * @author 오주환
+     * @version 1.0 22.07.07 가계부 상세내역 삭제
+     */
+    // 1.미들웨어 토큰 정보
+    // const userInfo = req.userInfo;
+    // 2.Header 토큰 정보
+    const { moneybook_id } = req.params;
+    const authorization = req.header("Authorization");
+    const currentTime = getCurrentTime();
+    if (authorization === undefined) {
+      return -1;
+    }
+
+    const moneybook = await MoneybookDetail.update(
+      {
+        deletedAt: currentTime,
+      },
+      {
+        where: { id: moneybook_id },
+      }
+    );
+
+    return moneybook;
+  },
+  recoverMoneybook: async (req) => {},
 };
 
 export default moneybookDetailService;
