@@ -15,6 +15,10 @@ const message = {
 
   REFRESH_TOKEN_UNNECESSARY: "token 갱신 불필요",
 
+  //회원가입 관련
+  ALREADY_EXIST_EMAIL: "이미 존재하는 이메일",
+  ALREADY_EXIST_NICKNAME: "이미 존재하는 닉네임"
+
 };
 
 export default message;

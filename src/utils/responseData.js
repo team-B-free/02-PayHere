@@ -12,7 +12,15 @@ const resignTokenResponse = (accessToken, refreshToken) => {
   };
 };
 
+const signUpResponse = (accessToken, refreshToken) => {
+  return {
+    accessToken,
+    refreshToken,
+  }
+}
+
 export {
   loginResponse,
   resignTokenResponse,
+  signUpResponse,
 };

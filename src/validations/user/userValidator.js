@@ -13,3 +13,11 @@ export const resignToken = {
     refreshtoken: Joi.string().required()
   })
 };
+
+export const signUp = {
+  body: Joi.object({
+    email: Joi.string().required(),
+    password: Joi.string().required(),
+    nickname: Joi.string().required()
+  })
+}
