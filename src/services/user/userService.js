@@ -6,19 +6,38 @@ import { signTokens } from '../../utils/jwtUtil.js';
 import { response, errResponse } from '../../utils/response.js';
 import message from '../../utils/responseMessage.js';
 import statusCode from '../../utils/statusCode.js';
-import { signUpResponse } from '../../utils/responseData.js';
+import { loginResponse, signUpResponse } from '../../utils/responseData.js';
 import CryptoJS from 'crypto-js';
 
-const getUserId = async (email, password) => {
+const login = async (email, password) => {
   try{
-    const userId = await User.findOne({
-      where: { email, password},
+    const user = await User.findOne({
+      where: {email, password},
       attributes: ['id']
     });
 
-    return userId;
+    if (!user){
+      return [
+        statusCode.BAD_REQUEST,
+        errResponse(statusCode.BAD_REQUEST, message.INVALID_USER_INFO)
+      ];
+    }
+
+    const userId = user.getDataValue('id');
+    const { accessToken, refreshToken } = await signTokens(userId);
+    const data = loginResponse(accessToken, refreshToken);
+
+    return [
+      statusCode.OK,
+      response(statusCode.OK, message.SUCCESS, data)
+    ];
+
   } catch(err){
-    logger.error(`getUserId Service Err: ${err}`);
+    logger.error(`login Service Err: ${err}`);
+    return [
+      statusCode.DB_ERROR,
+      errResponse(statusCode.DB_ERROR, message.INTERNAL_SERVER_ERROR)
+    ];
   }
 };
 
@@ -69,6 +88,6 @@ const signUp = async (email, password, nickname) => {
 };
 
 export default {
-  getUserId,
+  login,
   signUp,
 }
