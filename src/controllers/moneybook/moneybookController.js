@@ -16,6 +16,18 @@ const moneybookController = {
       .status(statusCode.OK)
       .send(response(statusCode.OK, message.SUCCESS));
   },
+
+  /**
+   * @author 박성용
+   * @version 1.0 22.7.6 최초 작성
+   */
+  setRestoreMoneyBook: async (req, res) => {
+    let id = req.params.id;
+    await moneybookService.restoreMoneybook(id);
+    return res
+      .status(statusCode.OK)
+      .send(response(statusCode.OK, message.SUCCESS));
+  },
 };
 
 export default moneybookController;

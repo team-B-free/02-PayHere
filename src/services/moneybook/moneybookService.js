@@ -15,6 +15,17 @@ const deleteMoneybook = async (id) => {
   }
 };
 
+/**
+ * @author 박성용
+ * @version 1.0 22.7.6 최초 작성
+ */
+const restoreMoneybook = async (id) => {
+  console.log("파라미터", id);
+  await Moneybook.restore({ where: { id: id } });
+  return console.log("RESTORE OK!");
+};
+
 export default {
   deleteMoneybook,
+  restoreMoneybook,
 };

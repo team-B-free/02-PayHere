@@ -3,5 +3,6 @@ import moneybookController from "./../../controllers/moneybook/moneybookControll
 const router = Router();
 
 router.patch("/status/:id", moneybookController.setDeleteMoneybook);
+router.patch("/recover/:id", moneybookController.setRestoreMoneyBook);
 
 export default router;
