@@ -4,6 +4,7 @@ dotenv.config();
 import { promisify } from 'util';
 import jwt from 'jsonwebtoken';
 import redisClient from '../config/redis.js';
+import { refreshStatus } from './constants.js';
 
 const jwtSecret = process.env.JWT_SECRET;
 
@@ -45,11 +46,11 @@ export const signRefreshToken = () => {
 };
 
 //refresh token 검증
-export const verifyRefreshToken = (token, userId) => {
+export const verifyRefreshToken = async (token, userId) => {
   const getAsync = promisify(redisClient.get).bind(redisClient);
   
   try{
-    const data = getAsync(userId);
+    const data = await getAsync(String(userId));
     if (token === data){
       try {
         jwt.verify(token, jwtSecret);
@@ -73,4 +74,40 @@ export const signTokens = async (userId) => {
   await redisClient.set(String(userId), refreshToken);  //발급한 refresh token을 redis에 저장
 
   return { accessToken, refreshToken };
+}
+
+/*
+  access token 재발급
+
+  토큰 재발급 시나리오
+  1. access token 만료, refresh token 만료 => 새로 로그인 필요
+  2. access token 만료, refresh token 만료x => 새로운 access token 발급
+  3. access token 만료x => refresh 필요x
+*/
+export const resignAccessToken = async (accessToken, refreshToken) => {
+  const accessTokenResult = verifyAccessToken(accessToken);
+  const decoded = jwt.decode(accessToken);
+
+  if (decoded === null){
+    return [refreshStatus.UNAUTHORIZED];
+  }
+
+  const { userId } = decoded;
+  const refreshTokenResult = verifyRefreshToken(refreshToken, userId);
+
+  if (accessTokenResult.message.includes('expires')){
+    //토큰 재발급 시나리오1
+    if (refreshTokenResult.ok === false){
+      return [refreshStatus.UNAUTHORIZED];
+    }
+    //토큰 재발급 시나리오2
+    else{
+      const newAccessToken = signAccessToken(userId);
+      return [refreshStatus.RESIGN_ACCESS_TOKEN, newAccessToken];
+    }
+  }
+  //토큰 재발급 시나리오3
+  else{
+    return [refreshStatus.UNNECESSARY];
+  }
 }

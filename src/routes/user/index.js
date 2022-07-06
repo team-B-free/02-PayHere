@@ -7,6 +7,7 @@ import * as validator from '../../validations/user/userValidator.js';
 const router = Router();
 
 router.get("/test", userController.getTest);
+router.get("/token-resign", validate(validator.resignToken), userController.resignToken);
 router.get("/login", validate(validator.login), authJWT, userController.login);
 
 export default router;

@@ -5,6 +5,14 @@ const loginResponse = (accessToken, refreshToken) => {
   };
 };
 
+const resignTokenResponse = (accessToken, refreshToken) => {
+  return {
+    accessToken,
+    refreshToken,
+  };
+};
+
 export {
   loginResponse,
+  resignTokenResponse,
 };
