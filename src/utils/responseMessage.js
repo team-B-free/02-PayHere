@@ -11,7 +11,10 @@ const message = {
   INVALID_USER_INFO: "존재하지 않는 회원정보",
   NULL_VALUE_ACEESS_TOKEN: "token 필요",
   ACCESS_TOKEN_EXPIRES: "token 만료",
-  INVALID_ACCESS_TOKEN: "token 검증 실패"
+  INVALID_ACCESS_TOKEN: "token 검증 실패",
+
+  REFRESH_TOKEN_UNNECESSARY: "token 갱신 불필요",
+
 };
 
 export default message;

@@ -6,3 +6,10 @@ export const login = {
     password: Joi.string().required()
   })
 };
+
+export const resignToken = {
+  headers: Joi.object({
+    authorization: Joi.string().required(),
+    refreshtoken: Joi.string().required()
+  })
+};
