@@ -116,7 +116,27 @@ const moneybookDetailService = {
 
     return moneybook;
   },
-  recoverMoneybook: async (req) => {},
+  recoverMoneybook: async (req) => {
+    /**
+     * @author 오주환
+     * @version 1.0 22.07.07 가계부 상세내역 복구
+     */
+    // 1.미들웨어 토큰 정보
+    // const userInfo = req.userInfo;
+    // 2.Header 토큰 정보
+    const { moneybook_id } = req.params;
+    console.log(moneybook_id);
+    const authorization = req.header("Authorization");
+    if (authorization === undefined) {
+      return -1;
+    }
+
+    const moneybook = await MoneybookDetail.restore({
+      where: { id: moneybook_id },
+    });
+
+    return moneybook;
+  },
 };
 
 export default moneybookDetailService;

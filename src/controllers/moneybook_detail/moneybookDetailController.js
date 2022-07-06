@@ -71,7 +71,7 @@ const moneybookDetailController = {
   deleteMoneybook: async (req, res) => {
     /**
      * @author 오주환
-     * @version 1.0 22.07.07 가계부 상세내역 수정
+     * @version 1.0 22.07.07 가계부 상세내역 삭제
      */
     const moneybook = await moneybookDetailService.deleteMoneybook(req);
     console.log("moneybook: ", moneybook);
@@ -88,8 +88,25 @@ const moneybookDetailController = {
         .send(response(statusCode.CREATED, message.SUCCESS, moneybook));
     }
   },
-  recoverMoneybook: (req, res) => {
-    return res.send("Test");
+  recoverMoneybook: async (req, res) => {
+    /**
+     * @author 오주환
+     * @version 1.0 22.07.07 가계부 상세내역 복구
+     */
+    const moneybook = await moneybookDetailService.recoverMoneybook(req);
+    console.log("moneybook: ", moneybook);
+
+    if (moneybook === 0) {
+      return res.send(errResponse(statusCode.NO_CONTENT, message.NO_CONTENT));
+    } else if (moneybook === -1) {
+      return res.send(
+        errResponse(statusCode.UNAUTHORIZED, message.UNAUTHORIZED)
+      );
+    } else {
+      return res
+        .status(statusCode.CREATED)
+        .send(response(statusCode.CREATED, message.SUCCESS, moneybook));
+    }
   },
 };
 export default moneybookDetailController;
