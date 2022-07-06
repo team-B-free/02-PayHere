@@ -22,7 +22,7 @@ const moneybookDetailService = {
         money,
         memo,
         money_type,
-        moneybook_id: 1,
+        moneybook_id: 55,
       });
       return moneybook;
     } catch (error) {
@@ -60,7 +60,35 @@ const moneybookDetailService = {
 
     return result;
   },
-  updateMoneybook: (req, res) => {},
+  updateMoneybook: async (req) => {
+    /**
+     * @author 오주환
+     * @version 1.0 22.07.07 가계부 상세내역 수정
+     */
+    // 1.미들웨어 토큰 정보
+    // const userInfo = req.userInfo;
+    // 2.Header 토큰 정보
+    const { moneybook_id } = req.params;
+    const { money, memo, money_type } = req.body;
+    const authorization = req.header("Authorization");
+
+    if (authorization === undefined) {
+      return -1;
+    }
+
+    const moneybook = await MoneybookDetail.update(
+      {
+        money,
+        memo,
+        money_type,
+      },
+      {
+        where: { moneybook_id },
+      }
+    );
+
+    return moneybook;
+  },
   deleteMoneybook: (req, res) => {},
   recoverMoneybook: (req, res) => {},
 };

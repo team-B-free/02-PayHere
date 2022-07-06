@@ -14,7 +14,7 @@ const moneybookService = {
     const authorization = req.header("Authorization");
 
     if (authorization === undefined) {
-      return 0;
+      return -1;
     }
 
     const moneybook = await Moneybook.update(
@@ -25,9 +25,7 @@ const moneybookService = {
       {
         where: { id: moneybook_idx },
       }
-    ).catch(() => {
-      return -1;
-    });
+    );
     return moneybook;
   },
 };
