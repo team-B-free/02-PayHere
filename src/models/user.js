@@ -12,7 +12,7 @@ class User extends Model {
         allowNull: false
       },
       password : {
-        type: DataTypes.STRING(45),
+        type: DataTypes.TEXT,
         allowNull: false
       },
       mbti : {
