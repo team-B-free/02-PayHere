@@ -1,6 +1,6 @@
 const moneybookController = {
-  getTest: (req, res) => {
-    res.send("Test");
+  updateMoneybook: (req, res) => {
+    res.send("머니북업데이트");
   },
 };
 
