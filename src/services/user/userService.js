@@ -7,16 +7,28 @@ import { response, errResponse } from '../../utils/response.js';
 import message from '../../utils/responseMessage.js';
 import statusCode from '../../utils/statusCode.js';
 import { loginResponse, signUpResponse } from '../../utils/responseData.js';
-import CryptoJS from 'crypto-js';
+import bcrypt from 'bcrypt';
 
 const login = async (email, password) => {
   try{
     const user = await User.findOne({
-      where: {email, password},
-      attributes: ['id']
+      where: { email },
+      attributes: ['id', 'password']
     });
 
     if (!user){
+      return [
+        statusCode.BAD_REQUEST,
+        errResponse(statusCode.BAD_REQUEST, message.INVALID_USER_INFO)
+      ];
+    }
+
+    const encodedPassword = user.getDataValue('password');
+    console.log(encodedPassword)
+    console.log(bcrypt.compareSync(password, encodedPassword))
+    
+    const isValidPassword = bcrypt.compareSync(password, encodedPassword);
+    if (!isValidPassword){
       return [
         statusCode.BAD_REQUEST,
         errResponse(statusCode.BAD_REQUEST, message.INVALID_USER_INFO)
@@ -65,9 +77,9 @@ const signUp = async (email, password, nickname) => {
       ]
     }
 
-    const cipherPassword = CryptoJS.AES.encrypt(password, process.env.CRYPTO_SECERT).toString();
+    const encryptedPassword = bcrypt.hashSync(password, 10);
 
-    const newUser = await User.create({email, password: cipherPassword, nickname});
+    const newUser = await User.create({email, password: encryptedPassword, nickname});
     const userId = newUser.user_id;
 
     const { accessToken, refreshToken } = await signTokens(userId);
