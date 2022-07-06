@@ -1,5 +1,24 @@
 import Moneybook from "../../models/moneybook.js";
+import User from "../../models/user.js";
 import { logger } from "../../config/winston.js";
+
+/**
+ * @author 박성용
+ * @version 1.0 22.7.6 최초 작성
+ */
+const mbtiMoneybook = async (mbti) => {
+  const getUsersMbti = await Moneybook.findAll({
+    include: [
+      {
+        model: User,
+        attributes: ["mbti"],
+        where: { mbti: mbti },
+        required: true,
+      },
+    ],
+  });
+  return getUsersMbti;
+};
 
 /**
  * @author 박성용
@@ -28,4 +47,5 @@ const restoreMoneybook = async (id) => {
 export default {
   deleteMoneybook,
   restoreMoneybook,
+  mbtiMoneybook,
 };
