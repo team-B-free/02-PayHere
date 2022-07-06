@@ -52,6 +52,15 @@ const userController = {
         .status(statusCode.BAD_REQUEST)
         .send(errResponse(statusCode.BAD_REQUEST, message.REFRESH_TOKEN_UNNECESSARY));
     }
+  },
+
+  signUp: async (req, res) => {
+    const { email, password, nickname } = req.body;
+    const [statusCode, result] = await userService.signUp(email, password, nickname);
+
+    return res
+      .status(statusCode)
+      .send(result);
   }
 };
 
