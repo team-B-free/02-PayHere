@@ -2,6 +2,6 @@ import { Router } from "express";
 import moneybookController from "./../../controllers/moneybook/moneybookController.js";
 const router = Router();
 
-router.get("/test", moneybookController.getTest);
+router.patch("/status/:id", moneybookController.setDeleteMoneybook);
 
 export default router;
