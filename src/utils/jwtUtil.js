@@ -13,7 +13,6 @@ export const signAccessToken = (userId) => {
   const payload = {
     userId,
   };
-  console.log(payload);
 
   return jwt.sign(payload, jwtSecret, {
     algorithm: "HS256",
@@ -26,7 +25,6 @@ export const verifyAccessToken = (token) => {
   let decoded = null;
   try {
     decoded = jwt.verify(token, jwtSecret);
-    console.log("decoded: ", decoded);
 
     return {
       ok: true,

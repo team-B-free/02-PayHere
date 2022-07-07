@@ -167,6 +167,124 @@ const createMoneybook = async (req) => {
   }
 };
 
+/** (DB) user 객체 반환
+ * @author 강채현
+ * @version 1.0
+ * @param {string} userId userId
+ * @returns {array<number, response>} response 또는 errResponse 객체
+ */
+const getUser = async (userId) => {
+  try {
+    const user = await User.findByPk(userId);
+
+    if (user) {
+      return [statusCode.OK, response(statusCode.OK, message.SUCCESS, user)];
+    } else {
+      return [
+        statusCode.NO_CONTENT,
+        errResponse(statusCode.NO_CONTENT, message.NO_CONTENT),
+      ];
+    }
+  } catch (err) {
+    console.log(err);
+    return [
+      statusCode.DB_ERROR,
+      errResponse(statusCode.DB_ERROR, message.DB_ERROR),
+    ];
+  }
+};
+
+/** (DB) user 정보 수정
+ * @author 강채현
+ * @version 1.0
+ * @param {User} user User 객체
+ * @param {string} newNickname 변경할 닉네임
+ * @param {string} newMbti 변경할 mbti
+ * @param {string} newPassword 변경할 비밀번호
+ * @returns {array<number, response>} response 또는 errResponse 객체
+ */
+const editUser = async (
+  userId,
+  newNickname = null,
+  newMbti = null,
+  newPassword = null
+) => {
+  const dataToEdit = {
+    newNickname,
+    newMbti,
+    newPassword,
+  };
+  const updatedData = [];
+
+  // (DB) USER SELECT query 및 Vaildation
+  const [statusCode, result] = getUser(userId);
+  if (!result.data) {
+    return [statusCode, result];
+  }
+
+  const user = result;
+  // 데이터 삽입
+  for (let key in dataToEdit) {
+    if (user[key] === dataToEdit[key] || !dataToEdit[key]) {
+      continue;
+    } else {
+      user[key] = dataToEdit[key];
+      updatedData.push({ [key]: dataToEdit[key] }); // 변경된 데이터
+    }
+  }
+
+  if (updatedData.length === 0) {
+    return [
+      statusCode.BAD_REQUEST,
+      errResponse(statusCode.BAD_REQUEST, message.BAD_REQUEST),
+    ];
+  }
+
+  try {
+    await user.save(); // DB UPDATE
+    return [statusCode.OK, response(statusCode.OK, message.SUCCESS)];
+  } catch (err) {
+    console.log(err);
+    return [
+      statusCode.DB_ERROR,
+      errResponse(statusCode.DB_ERROR, message.DB_ERROR),
+    ];
+  }
+};
+
+/** (DB) user 삭제
+ * @author 강채현
+ * @version 1.0
+ * @param {User} user User 객체
+ * @returns {array<number, response>} response 또는 errResponse 객체
+ */
+const deleteUser = async (userId) => {
+  // (DB) USER SELECT query 및 Vaildation
+  const [statusCode, result] = getUser(userId);
+  if (!result.data) {
+    return [statusCode, result];
+  }
+
+  const user = result;
+  try {
+    // (models/user.js) paranoid:true => Soft delete
+    await user.destroy({
+      where: {
+        email: user.email,
+        password: user.password,
+      },
+    });
+
+    return [statusCode.OK, response(statusCode.OK, message.SUCCESS)];
+  } catch (err) {
+    console.log(err);
+    return [
+      statusCode.DB_ERROR,
+      errResponse(statusCode.DB_ERROR, message.DB_ERROR),
+    ];
+  }
+};
+
 export default {
   login,
   signUp,
@@ -174,4 +292,7 @@ export default {
   resignToken,
   readAllMoneybookByDate,
   createMoneybook,
+  getUser,
+  editUser,
+  deleteUser,
 };

@@ -11,7 +11,7 @@ router.post("/:moneybook_id", moneybookDetailController.createMoneybook);
  * @author 오주환
  * @version 1.0 22.07.07 가계부 상세내역 전체 조회
  */
-router.get("/:moneybook_id", moneybookDetailController.readAllMoneybook);
+// router.get("/:moneybook_id", moneybookDetailController.readAllMoneybook);
 /**
  * @author 오주환
  * @version 1.0 22.07.07 가계부 상세내역 수정
@@ -29,6 +29,10 @@ router.delete("/:moneybook_id", moneybookDetailController.deleteMoneybook);
 router.patch(
   "/recovery/:moneybook_id",
   moneybookDetailController.recoverMoneybook
+);
+router.get(
+  "/:moneybook_id",
+  moneybookDetailController.getAnotherUsersMoneybook
 );
 
 export default router;

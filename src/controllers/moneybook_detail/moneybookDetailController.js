@@ -23,6 +23,26 @@ const moneybookDetailController = {
         .send(response(statusCode.CREATED, message.SUCCESS, moneybook));
     }
   },
+  /**
+   * @author 박성용
+   * @version 1.0 22.7.6 최초 작성
+   */
+  getAnotherUsersMoneybook: async (req, res) => {
+    // eslint-disable-next-line no-unused-vars
+    const { moneybook_id } = req.params;
+    const { type } = req.query;
+    const data = { moneybook_id, type };
+    try {
+      const result = await moneybookDetailService.anotherUsersMoneybooks(data);
+      return res.status(result.status).send(result);
+    } catch (err) {
+      console.log(err);
+      return [
+        statusCode.BAD_REQUEST,
+        errResponse(statusCode.BAD_REQUEST, message.INVALID_USER_INFO),
+      ];
+    }
+  },
   readAllMoneybook: async (req, res) => {
     /**
      * @author 오주환
