@@ -132,6 +132,9 @@ const readAllMoneybookByDate = async (req) => {
   /**
    * @author 오주환
    * @version 1.0 22.07.07 가계부 조회(날짜) 생성
+   *
+   * @author 박성용
+   * @version 1.1 22.07.08 쿼리문 변경하여 조회되지 않는 이슈 해결
    */
   const { userId } = req;
 
@@ -141,7 +144,7 @@ const readAllMoneybookByDate = async (req) => {
     return 0;
   } else {
     const result = Moneybook.sequelize.query(
-      `SELECT id, title, is_shared, view, created_at FROM moneybook WHERE user_id=${userId} AND created_at >= '${startDate}' AND created_at <= '${endDate}' ORDER BY created_at DESC;`,
+      `SELECT id, title, is_shared, view, created_at, user_id FROM moneybook WHERE (user_id = ${userId}) AND (created_at >= '${startDate}' AND created_at <= date_add('${endDate}',INTERVAL 1 DAY)) ORDER BY created_at ASC;`,
       { model: Moneybook }
     );
 
