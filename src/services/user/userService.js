@@ -1,5 +1,6 @@
 import dotenv from 'dotenv';
 dotenv.config();
+
 import { logger } from '../../config/winston.js';
 import User from '../../models/user.js';
 import { signTokens } from '../../utils/jwtUtil.js';
@@ -15,6 +16,7 @@ import { resignTokenResponse } from '../../utils/responseData.js';
 import { Op } from 'sequelize'; // 유사 검색을 위한 sequlize 기능 Op
 
 const login = async (email, password) => {
+
   try{
     const user = await User.findOne({
       where: { email },
@@ -59,6 +61,7 @@ const login = async (email, password) => {
 };
 
 const signUp = async (email, password, nickname) => {
+
   try{
     const isExistEmail = await User.findOne({
       where: { email },
@@ -83,6 +86,7 @@ const signUp = async (email, password, nickname) => {
     }
 
     const encryptedPassword = bcrypt.hashSync(password, 10);
+
 
     const newUser = await User.create({email, password: encryptedPassword, nickname});
     const userId = newUser.user_id;

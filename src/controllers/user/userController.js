@@ -3,6 +3,7 @@ import statusCode from '../../utils/statusCode.js';
 import { errResponse } from '../../utils/response.js';
 import message from '../../utils/responseMessage.js';
 
+
 const userController = {
   getTest: (req, res) => {
     res.send("Test");
@@ -46,7 +47,6 @@ const userController = {
         .status(statusCode.INTERNAL_SERVER_ERROR)
         .send(errResponse(statusCode.INTERNAL_SERVER_ERROR, message.INTERNAL_SERVER_ERROR));
     }
-
   },
 
   /** 회원정보 삭제 API
@@ -76,7 +76,6 @@ const userController = {
       return res
           .status(delResultInfo.status)
           .send(delResultInfo)
-
     } catch(err) {
       console.log(err);
       return res
@@ -107,6 +106,7 @@ const userController = {
 
   signUp: async (req, res) => {
     const { email, password, nickname } = req.body;
+
     const [statusCode, result] = await userService.signUp(email, password, nickname);
 
     return res
