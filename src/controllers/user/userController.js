@@ -1,6 +1,5 @@
 import userService from '../../services/user/userService.js';
 
-
 const userController = {
   /** 회원정보 수정 API
    * @author 강채현
@@ -15,7 +14,7 @@ const userController = {
     } = req.body
 
     // (DB) USER UPDATE query 및 Validation
-    const [ statusCode, result ] = userService.editUser(userId, newNickName, newMbti, newPassword);
+    const [ statusCode, result ] = await userService.editUser(userId, newNickName, newMbti, newPassword);
 
     return res
       .status(statusCode)
@@ -28,7 +27,6 @@ const userController = {
    */
   deleteUser: async (req, res) => {
     const { userId } = req;
-
     // (DB) USER DELETE query 및 Vaildation
     const [statusCode, result] = await userService.deleteUser(userId);
 
