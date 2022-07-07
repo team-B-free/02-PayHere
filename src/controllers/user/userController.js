@@ -1,5 +1,6 @@
 import userService from '../../services/user/userService.js';
 
+
 const userController = {
   /** 회원정보 수정 API
    * @author 강채현
@@ -58,6 +59,7 @@ const userController = {
 
   signUp: async (req, res) => {
     const { email, password, nickname } = req.body;
+
     const [statusCode, result] = await userService.signUp(email, password, nickname);
 
     return res
