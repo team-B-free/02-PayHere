@@ -40,8 +40,8 @@ const moneybookController = {
    * @version 1.0 22.7.6 최초 작성
    */
   setDeleteMoneybook: async (req, res) => {
-    let id = req.params.id;
-    await moneybookService.deleteMoneybook(id);
+    let moneybook_id = req.params.moneybook_id;
+    await moneybookService.deleteMoneybook(moneybook_id);
 
     return res
       .status(statusCode.OK)
@@ -53,8 +53,8 @@ const moneybookController = {
    * @version 1.0 22.7.6 최초 작성
    */
   setRestoreMoneyBook: async (req, res) => {
-    let id = req.params.id;
-    await moneybookService.restoreMoneybook(id);
+    let moneybook_id = req.params.moneybook_id;
+    await moneybookService.restoreMoneybook(moneybook_id);
     return res
       .status(statusCode.OK)
       .send(response(statusCode.OK, message.SUCCESS));
