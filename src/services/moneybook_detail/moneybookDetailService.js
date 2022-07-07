@@ -9,7 +9,7 @@ import { logger } from "../../config/winston.js";
  */
 const anotherUsersMoneybooks = async (query) => {
   let type = parseInt(query.type, 10);
-  let userId = parseInt(query.user_idx, 10);
+  let moneybook_id = parseInt(query.moneybook_id, 10);
 
   try {
     const getAnotherMoneybooks = await moneybookDetail.findAll({
@@ -21,7 +21,7 @@ const anotherUsersMoneybooks = async (query) => {
           model: Moneybook,
           attributes: ["id", "title"],
           exclude: ["created_At", "updated_At", "deleted_At"],
-          where: { user_id: userId },
+          where: { id: moneybook_id },
           required: true,
         },
       ],

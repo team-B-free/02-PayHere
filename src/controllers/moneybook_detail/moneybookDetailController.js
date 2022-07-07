@@ -10,10 +10,12 @@ const moneybookDetailController = {
    */
   getAnotherUsersMoneybook: async (req, res) => {
     // eslint-disable-next-line no-unused-vars
-    let { type, user_idx } = req.query;
-    const result = await moneybookDetailService.anotherUsersMoneybooks(
-      req.query
-    );
+    let moneybook_id = req.params.moneybook_id; //1
+    let { type } = req.query; //1
+
+    let data = { moneybook_id, type };
+
+    const result = await moneybookDetailService.anotherUsersMoneybooks(data);
 
     console.log("타인 가계부 조회 결과", result);
     return res
