@@ -11,5 +11,7 @@ router.post("/token-resign", validate(validator.resignToken), userController.res
 router.post("/login", validate(validator.login), userController.login);
 router.post("/signup", validate(validator.signUp), userController.signUp);
 router.post("/logout", authJWT, userController.logout);
+router.patch('/', validate(validator.editUser), authJWT, userController.editUser); // 회원정보 수정
+router.delete('/', validate(validator.deleteUser), authJWT, userController.deleteUser); // 회원 삭제
 
 export default router;
