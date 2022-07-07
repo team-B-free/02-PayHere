@@ -17,11 +17,14 @@ const userController = {
     } = req.body;
 
     // (DB) USER UPDATE query 및 Validation
-    const [ statusCode, result ] = await userService.editUser(userId, newNickName, newMbti, newPassword);
+    const [statusCode, result] = await userService.editUser(
+      userId,
+      newNickName,
+      newMbti,
+      newPassword
+    );
 
-    return res
-      .status(statusCode)
-      .send(result)
+    return res.status(statusCode).send(result);
   },
 
   /** 회원정보 삭제 API
@@ -56,12 +59,13 @@ const userController = {
   },
 
   signUp: async (req, res) => {
-    const { email, password, nickname } = req.body;
+    const { email, password, nickname, mbti } = req.body;
 
     const [statusCode, result] = await userService.signUp(
       email,
       password,
-      nickname
+      nickname,
+      mbti
     );
 
     return res.status(statusCode).send(result);

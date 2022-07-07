@@ -54,7 +54,7 @@ const login = async (email, password) => {
   }
 };
 
-const signUp = async (email, password, nickname) => {
+const signUp = async (email, password, nickname, mbti) => {
   try {
     const isExistEmail = await User.findOne({
       where: { email },
@@ -80,8 +80,12 @@ const signUp = async (email, password, nickname) => {
 
     const encryptedPassword = bcrypt.hashSync(password, 10);
 
-
-    const newUser = await User.create({email, password: encryptedPassword, nickname});
+    const newUser = await User.create({
+      email,
+      password: encryptedPassword,
+      nickname,
+      mbti,
+    });
     const userId = newUser.id;
 
     const { accessToken, refreshToken } = await signTokens(userId);
@@ -168,7 +172,7 @@ const createMoneybook = async (req) => {
  * @author 강채현
  * @version 1.0
  * @param {string} userId userId
- * @returns {array} response 또는 errResponse 객체 
+ * @returns {array} response 또는 errResponse 객체
  */
 const getUser = async (userId) => {
   try {
@@ -200,21 +204,24 @@ const getUser = async (userId) => {
  * @param {string} newPassword 변경할 비밀번호
  * @returns {array<number, response>} response 또는 errResponse 객체
  */
-const editUser = async (userId, newNickname = null, newMbti = null, newPassword = null) => {
+const editUser = async (
+  userId,
+  newNickname = null,
+  newMbti = null,
+  newPassword = null
+) => {
   const dataToEdit = {
     newNickname,
     newMbti,
     newPassword,
   };
   const updatedData = [];
+  console.log("현재유저의 id", userId);
 
   // (DB) USER SELECT query 및 Vaildation
   const [status, result] = await getUser(userId);
-  if(!result.data) {
-    return [
-      status,
-      result
-    ]
+  if (!result.data) {
+    return [status, result];
   }
 
   const user = result.data;
@@ -256,11 +263,8 @@ const editUser = async (userId, newNickname = null, newMbti = null, newPassword 
 const deleteUser = async (userId) => {
   // (DB) USER SELECT query 및 Vaildation
   const [status, result] = await getUser(userId);
-  if(!result.data) {
-    return [
-      status,
-      result
-    ]
+  if (!result.data) {
+    return [status, result];
   }
 
   const user = result.data;
