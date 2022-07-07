@@ -52,6 +52,15 @@ const userController = {
     return res
       .status(statusCode)
       .send(result);
+  },
+
+  logout: async (req, res) => {
+    const { userId } = req;
+    const [statusCode, result] = await userService.logout(userId);
+
+    return res
+      .status(statusCode)
+      .send(result);
   }
 };
 

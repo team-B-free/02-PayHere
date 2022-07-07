@@ -8,6 +8,7 @@ import message from '../../utils/responseMessage.js';
 import statusCode from '../../utils/statusCode.js';
 import { loginResponse, signUpResponse } from '../../utils/responseData.js';
 import bcrypt from 'bcrypt';
+import redisClient from '../../config/redis.js';
 
 const login = async (email, password) => {
   try{
@@ -99,7 +100,17 @@ const signUp = async (email, password, nickname) => {
   }
 };
 
+const logout = async (userId) => {
+  redisClient.del(String(userId));
+
+  return [
+    statusCode.OK,
+    response(statusCode.OK, message.SUCCESS)
+  ];
+};
+
 export default {
   login,
   signUp,
+  logout,
 }
