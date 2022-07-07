@@ -9,6 +9,9 @@ import statusCode from '../../utils/statusCode.js';
 import { loginResponse, signUpResponse } from '../../utils/responseData.js';
 import bcrypt from 'bcrypt';
 import redisClient from '../../config/redis.js';
+import { resignAccessToken } from '../../utils/jwtUtil.js';
+import { refreshStatus } from '../../utils/constants.js';
+import { resignTokenResponse } from '../../utils/responseData.js';
 
 const login = async (email, password) => {
   try{
@@ -109,8 +112,34 @@ const logout = async (userId) => {
   ];
 };
 
+const resignToken = async (accessToken, refreshToken) => {
+  const [result, newAccessToken] = await resignAccessToken(accessToken, refreshToken);
+
+  if (result === refreshStatus.RESIGN_ACCESS_TOKEN){
+
+    const data = resignTokenResponse(newAccessToken, refreshToken);
+    return [
+      statusCode.OK,
+      response(statusCode.SUCCESS, message.SUCCESS, data)
+    ];
+  }
+  else if (result === refreshStatus.UNAUTHORIZED){
+    return [
+      statusCode.UNAUTHORIZED,
+      errResponse(statusCode.UNAUTHORIZED, message.FORBIDDEN)
+    ];
+  }
+  else if (result === refreshStatus.UNNECESSARY){
+    return [
+      statusCode.BAD_REQUEST,
+      errResponse(statusCode.BAD_REQUEST, message.REFRESH_TOKEN_UNNECESSARY)
+    ];
+  }
+}
+
 export default {
   login,
   signUp,
   logout,
+  resignToken,
 }
