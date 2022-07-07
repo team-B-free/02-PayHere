@@ -9,7 +9,6 @@ const moneybookDetailController = {
      * @author 오주환
      * @version 1.0 22.07.06 가계부 상세내역 추가
      */
-
     const moneybook = await moneybookDetailService.createMoneybook(req);
 
     if (moneybook === 0) {
@@ -29,9 +28,6 @@ const moneybookDetailController = {
      * @author 오주환
      * @version 1.0 22.07.07 가계부 상세내역 조회
      */
-    // 1.미들웨어 토큰 정보
-    // const userInfo = req.userInfo;
-    // 2.Header 토큰 정보
     const moneybook = await moneybookDetailService.readAllMoneybook(req);
 
     if (moneybook === 0) {

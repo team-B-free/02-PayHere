@@ -1,6 +1,7 @@
 import { Router } from "express";
 import moneybookDetailController from "./../../controllers/moneybook_detail/moneybookDetailController.js";
 const router = Router();
+
 /**
  * @author 오주환
  * @version 1.0 22.07.07 가계부 상세내역 생성

@@ -15,7 +15,7 @@ app.use((err, req, res, next) => {
     next();
     return res
       .status(statusCode.BAD_REQUEST)
-      .send(errResponse(statusCode.BAD_REQUEST, message.BAD_REQUEST));
+      .send(errResponse(statusCode.BAD_REQUEST, message.NULL_VALUE));
   }
 });
 

@@ -1,18 +1,28 @@
 import { Router } from "express";
+import { validate } from "express-validation";
 import userController from "./../../controllers/user/userController.js";
+import * as validator from "../../validations/user/userValidator.js";
+import authJWT from "../../middlewares/auth.js";
+
 const router = Router();
 
-router.post("/signup", userController.signupUser);
-
-/**
- * @author 오주환
- * @version 1.0 22.07.06 가계부 생성
- */
-router.post("/moneybooks", userController.createMoneybook);
+router.post(
+  "/token-resign",
+  validate(validator.resignToken),
+  userController.resignToken
+);
+router.post("/login", validate(validator.login), userController.login);
+router.post("/signup", validate(validator.signUp), userController.signUp);
+router.post("/logout", authJWT, userController.logout);
 /**
  * @author 오주환
  * @version 1.0 22.07.06 가계부 조회(날짜)
  */
-router.get("/moneybooks", userController.readAllMoneybookByDate);
+router.get("/moneybooks", authJWT, userController.readAllMoneybookByDate);
+/**
+ * @author 오주환
+ * @version 1.0 22.07.06 가계부 생성
+ */
+router.post("/moneybooks", authJWT, userController.createMoneybook);
 
 export default router;

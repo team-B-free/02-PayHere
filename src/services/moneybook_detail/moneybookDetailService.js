@@ -8,15 +8,6 @@ const moneybookDetailService = {
      * @author 오주환
      * @version 1.0 22.07.07 가계부 상세내역
      */
-    // 1.미들웨어 토큰 정보
-    // const userInfo = req.userInfo;
-    // 2.Header 토큰 정보
-    const authorization = req.header("Authorization");
-
-    if (authorization === undefined) {
-      return 0;
-    }
-
     const { moneybook_id } = req.params;
     const { money, memo, money_type, occured_at } = req.body;
     const occuredAt = setConvertTime(occured_at);
@@ -39,15 +30,6 @@ const moneybookDetailService = {
      * @author 오주환
      * @version 1.0 22.07.07 가계부 상세내역 조회
      */
-    // 1.미들웨어 토큰 정보
-    // const userInfo = req.userInfo;
-    // 2.Header 토큰 정보
-    const authorization = req.header("Authorization");
-
-    if (authorization === undefined) {
-      return 0;
-    }
-
     const { moneybook_id } = req.params;
 
     const result = await MoneybookDetail.findAll({
@@ -83,9 +65,6 @@ const moneybookDetailService = {
      * @author 오주환
      * @version 1.0 22.07.07 가계부 상세내역 수정
      */
-    // 1.미들웨어 토큰 정보
-    // const userInfo = req.userInfo;
-    // 2.Header 토큰 정보
     const { moneybook_id } = req.params;
     const { money, memo, money_type } = req.body;
     const authorization = req.header("Authorization");
@@ -101,7 +80,7 @@ const moneybookDetailService = {
         money_type,
       },
       {
-        where: { moneybook_id },
+        where: { id: moneybook_id },
       }
     );
 
@@ -112,15 +91,8 @@ const moneybookDetailService = {
      * @author 오주환
      * @version 1.0 22.07.07 가계부 상세내역 삭제
      */
-    // 1.미들웨어 토큰 정보
-    // const userInfo = req.userInfo;
-    // 2.Header 토큰 정보
     const { moneybook_id } = req.params;
-    const authorization = req.header("Authorization");
     const currentTime = getCurrentTime();
-    if (authorization === undefined) {
-      return -1;
-    }
 
     const moneybook = await MoneybookDetail.update(
       {
@@ -138,15 +110,8 @@ const moneybookDetailService = {
      * @author 오주환
      * @version 1.0 22.07.07 가계부 상세내역 복구
      */
-    // 1.미들웨어 토큰 정보
-    // const userInfo = req.userInfo;
-    // 2.Header 토큰 정보
     const { moneybook_id } = req.params;
     console.log(moneybook_id);
-    const authorization = req.header("Authorization");
-    if (authorization === undefined) {
-      return -1;
-    }
 
     const moneybook = await MoneybookDetail.restore({
       where: { id: moneybook_id },

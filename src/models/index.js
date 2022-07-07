@@ -1,6 +1,4 @@
-import dotenv from "dotenv";
-dotenv.config();
-
+import "../utils/envUtil.js";
 import Sequelize from "sequelize";
 import MoneybookDetail from "./moneybookDetail.js";
 import Moneybook from "./moneybook.js";

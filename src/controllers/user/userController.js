@@ -4,27 +4,48 @@ import { errResponse, response } from "./../../utils/response.js";
 import userService from "../../services/user/userService.js";
 
 const userController = {
-  signupUser: async (req, res) => {
-    try {
-      const user = await userService.signupUser(req);
+  login: async (req, res) => {
+    const { email, password } = req.body;
+    const [statusCode, result] = await userService.login(email, password);
 
-      return res
-        .status(statusCode.CREATED)
-        .send(response(statusCode.CREATED, message.SUCCESS, user));
-    } catch (err) {
-      return res
-        .status(statusCode.BAD_REQUEST)
-        .send(errResponse(statusCode.BAD_REQUEST, message.BAD_REQUEST));
-    }
+    return res.status(statusCode).send(result);
+  },
+
+  resignToken: async (req, res) => {
+    const { authorization, refreshtoken: refreshToken } = req.headers;
+    const accessToken = authorization.split(" ").reverse()[0];
+
+    const [statusCode, result] = await userService.resignToken(
+      accessToken,
+      refreshToken
+    );
+
+    return res.status(statusCode).send(result);
+  },
+
+  signUp: async (req, res) => {
+    const { email, password, nickname } = req.body;
+    const [statusCode, result] = await userService.signUp(
+      email,
+      password,
+      nickname
+    );
+
+    return res.status(statusCode).send(result);
+  },
+
+  logout: async (req, res) => {
+    const { userId } = req;
+
+    const [statusCode, result] = await userService.logout(userId);
+
+    return res.status(statusCode).send(result);
   },
   readAllMoneybookByDate: async (req, res) => {
     /**
      * @author 오주환
      * @version 1.0 22.07.07 가계부 조회(날짜 조건)
      */
-    // 1.미들웨어 토큰 정보
-    // const userInfo = req.userInfo;
-    // 2.Header 토큰 정보
     const moneybook = await userService.readAllMoneybookByDate(req);
 
     if (moneybook === 0) {
