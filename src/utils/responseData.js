@@ -16,11 +16,7 @@ const signUpResponse = (accessToken, refreshToken) => {
   return {
     accessToken,
     refreshToken,
-  }
-}
-
-export {
-  loginResponse,
-  resignTokenResponse,
-  signUpResponse,
+  };
 };
+
+export { loginResponse, resignTokenResponse, signUpResponse };

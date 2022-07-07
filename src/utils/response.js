@@ -3,8 +3,8 @@ const response = (status, message, data) => {
     status,
     success: true,
     message,
-    data
-  }
+    data,
+  };
 };
 
 const errResponse = (status, message, data) => {
@@ -12,11 +12,8 @@ const errResponse = (status, message, data) => {
     status,
     success: false,
     message,
-    data
-  }
+    data,
+  };
 };
 
-export {
-  response,
-  errResponse,
-};
+export { response, errResponse };
