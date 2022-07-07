@@ -1,7 +1,7 @@
-import moneybookService from "../../services/moneybook/moneybookService.js";
-import { errResponse } from "../../utils/response.js";
-import statusCode from "../../utils/statusCode.js";
-import message from "../../utils/responseMessage.js";
+import moneybookService from "./../../services/moneybook/moneybookService.js";
+import statusCode from "./../../utils/statusCode.js";
+import message from "./../../utils/responseMessage.js";
+import { errResponse, response } from "./../../utils/response.js";
 
 const moneybookController = {
   /**
@@ -65,6 +65,25 @@ const moneybookController = {
       return res
         .status(statusCode.BAD_REQUEST)
         .send(errResponse(statusCode.BAD_REQUEST, message.BAD_REQUEST));
+    }
+  },
+  updateMoneybook: async (req, res) => {
+    /**
+     * @author 오주환
+     * @version 1.0 22.07.06 가계부 수정
+     */
+    const moneybook = await moneybookService.updateMoneybook(req);
+
+    if (moneybook === -1) {
+      return res
+        .status(statusCode.UNAUTHORIZED)
+        .send(errResponse(statusCode.UNAUTHORIZED, message.UNAUTHORIZED));
+    } else if (moneybook[0] === 0) {
+      return res.send(errResponse(statusCode.NO_CONTENT, message.NO_CONTENT));
+    } else {
+      return res
+        .status(statusCode.CREATED)
+        .send(response(statusCode.CREATED, message.SUCCESS, moneybook));
     }
   },
 };

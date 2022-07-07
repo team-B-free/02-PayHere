@@ -1,35 +1,36 @@
-import dotenv from 'dotenv';
+import dotenv from "dotenv";
 dotenv.config();
 
-import { promisify } from 'util';
-import jwt from 'jsonwebtoken';
-import redisClient from '../config/redis.js';
-import { resignTokenStatus } from './constants.js';
+import { promisify } from "util";
+import jwt from "jsonwebtoken";
+import redisClient from "../config/redis.js";
+import { resignTokenStatus } from "./constants.js";
 
 const jwtSecret = process.env.JWT_SECRET;
 
 //access token 발급
 export const signAccessToken = (userId) => {
   const payload = {
-    userId
+    userId,
   };
 
   return jwt.sign(payload, jwtSecret, {
-    algorithm: 'HS256',
-    expiresIn: '1h',
+    algorithm: "HS256",
+    expiresIn: "1h",
   });
 };
 
 //access token 검증
 export const verifyAccessToken = (token) => {
   let decoded = null;
-  try{
+  try {
     decoded = jwt.verify(token, jwtSecret);
+
     return {
       ok: true,
-      userId: decoded.userId
+      userId: decoded.userId,
     };
-  }catch(err){
+  } catch (err) {
     return {
       ok: false,
       message: err.message,
@@ -40,28 +41,28 @@ export const verifyAccessToken = (token) => {
 //refresh token 발급
 export const signRefreshToken = () => {
   return jwt.sign({}, jwtSecret, {
-    algorithm: 'HS256',
-    expiresIn: '14d'
+    algorithm: "HS256",
+    expiresIn: "14d",
   });
 };
 
 //refresh token 검증
 export const verifyRefreshToken = async (token, userId) => {
   const getAsync = promisify(redisClient.get).bind(redisClient);
-  
-  try{
+
+  try {
     const data = await getAsync(String(userId));
-    if (token === data){
+    if (token === data) {
       try {
         jwt.verify(token, jwtSecret);
         return true;
-      } catch (err){
+      } catch (err) {
         return false;
       }
-    } else{
+    } else {
       return false;
     }
-  } catch(err){
+  } catch (err) {
     return false;
   }
 };
@@ -71,10 +72,10 @@ export const signTokens = async (userId) => {
   const accessToken = signAccessToken(userId);
   const refreshToken = signRefreshToken();
 
-  await redisClient.set(String(userId), refreshToken);  //발급한 refresh token을 redis에 저장
+  await redisClient.set(String(userId), refreshToken); //발급한 refresh token을 redis에 저장
 
   return { accessToken, refreshToken };
-}
+};
 
 /*
   access token 재발급
@@ -88,26 +89,26 @@ export const resignAccessToken = async (accessToken, refreshToken) => {
   const accessTokenResult = verifyAccessToken(accessToken);
   const decoded = jwt.decode(accessToken);
 
-  if (decoded === null){
+  if (decoded === null) {
     return [resignTokenStatus.UNAUTHORIZED];
   }
 
   const { userId } = decoded;
   const refreshTokenResult = verifyRefreshToken(refreshToken, userId);
 
-  if (accessTokenResult.message.includes('expires')){
+  if (accessTokenResult.message.includes("expires")) {
     //토큰 재발급 시나리오1
-    if (refreshTokenResult.ok === false){
+    if (refreshTokenResult.ok === false) {
       return [resignTokenStatus.UNAUTHORIZED];
     }
     //토큰 재발급 시나리오2
-    else{
+    else {
       const newAccessToken = signAccessToken(userId);
       return [resignTokenStatus.RESIGN_ACCESS_TOKEN, newAccessToken];
     }
   }
   //토큰 재발급 시나리오3
-  else{
+  else {
     return [resignTokenStatus.UNNECESSARY];
   }
-}
+};

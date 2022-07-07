@@ -4,6 +4,4 @@ const resignTokenStatus = {
   UNNECESSARY: 3,
 };
 
-export {
-  resignTokenStatus,
-}
+export { resignTokenStatus };
