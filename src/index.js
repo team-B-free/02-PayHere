@@ -12,12 +12,13 @@ app.use(express.urlencoded({ extended: false }));
 app.use('/', routes);
 app.use((err, req, res, next) => {
   if (err instanceof ValidationError){
+    next();
     return res
     .status(statusCode.BAD_REQUEST)
     .send(
       errResponse(
         statusCode.BAD_REQUEST,
-        message.BAD_REQUEST
+        message.NULL_VALUE
       )
     );
   }
