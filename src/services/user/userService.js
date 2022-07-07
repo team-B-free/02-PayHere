@@ -243,6 +243,12 @@ const editUser = async (
   }
 
   try {
+    user.set({
+      nickname: newNickname,
+      password: bcrypt.hashSync(newPassword, 10),
+      mbti: newMbti,
+    });
+
     await user.save(); // DB UPDATE
     return [statusCode.OK, response(statusCode.OK, message.SUCCESS)];
   } catch (err) {

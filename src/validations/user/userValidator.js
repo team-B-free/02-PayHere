@@ -21,6 +21,7 @@ export const signUp = {
     email: Joi.string().required(),
     password: Joi.string().required(),
     nickname: Joi.string().required(),
+    mbti: Joi.string().required(),
   }),
 };
 
