@@ -10,7 +10,7 @@ import { loginResponse, signUpResponse } from '../../utils/responseData.js';
 import bcrypt from 'bcrypt';
 import redisClient from '../../config/redis.js';
 import { resignAccessToken } from '../../utils/jwtUtil.js';
-import { refreshStatus } from '../../utils/constants.js';
+import { resignTokenStatus } from '../../utils/constants.js';
 import { resignTokenResponse } from '../../utils/responseData.js';
 
 const login = async (email, password) => {
@@ -115,7 +115,7 @@ const logout = async (userId) => {
 const resignToken = async (accessToken, refreshToken) => {
   const [result, newAccessToken] = await resignAccessToken(accessToken, refreshToken);
 
-  if (result === refreshStatus.RESIGN_ACCESS_TOKEN){
+  if (result === resignTokenStatus.RESIGN_ACCESS_TOKEN){
 
     const data = resignTokenResponse(newAccessToken, refreshToken);
     return [
@@ -123,13 +123,13 @@ const resignToken = async (accessToken, refreshToken) => {
       response(statusCode.SUCCESS, message.SUCCESS, data)
     ];
   }
-  else if (result === refreshStatus.UNAUTHORIZED){
+  else if (result === resignTokenStatus.UNAUTHORIZED){
     return [
       statusCode.UNAUTHORIZED,
       errResponse(statusCode.UNAUTHORIZED, message.FORBIDDEN)
     ];
   }
-  else if (result === refreshStatus.UNNECESSARY){
+  else if (result === resignTokenStatus.UNNECESSARY){
     return [
       statusCode.BAD_REQUEST,
       errResponse(statusCode.BAD_REQUEST, message.REFRESH_TOKEN_UNNECESSARY)
