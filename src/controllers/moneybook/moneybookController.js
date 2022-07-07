@@ -25,10 +25,10 @@ const moneybookController = {
           );
       }
       const result = await moneybookService.mbtiMoneybook(mbti);
-      result.forEach((data) => console.log(data.dataValues.title));
+      console.log("mbti별 가계부 조회 결과", result);
       return res
         .status(statusCode.OK)
-        .send(response(statusCode.OK, message.SUCCESS));
+        .send(response(statusCode.OK, message.SUCCESS, result));
     } else {
       // 쿼리 요청이 mbti가 아니면 다음 함수로 이동 - > getOtherUsersMoneybook
       next();

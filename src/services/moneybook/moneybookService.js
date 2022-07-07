@@ -8,16 +8,39 @@ import { logger } from "../../config/winston.js";
  */
 const mbtiMoneybook = async (mbti) => {
   const getUsersMbti = await Moneybook.findAll({
+    where: { is_shared: "Y" },
+    attributes: ["id", "title", "is_shared", "view", "user_id"],
+
     include: [
       {
         model: User,
-        attributes: ["mbti"],
+        attributes: ["mbti", "nickname"],
+        exclude: ["created_at", "updated_at", "deleted_at"],
         where: { mbti: mbti },
         required: true,
       },
     ],
   });
-  return getUsersMbti;
+
+  let mbtiDataList = [];
+  getUsersMbti.forEach((data) => {
+    let mbtiData = {
+      moneybook_id: data.dataValues.id,
+      title: data.dataValues.title,
+      view: data.dataValues.view,
+      userId: data.dataValues.user_id,
+      nickname: data.dataValues.USER.dataValues.nickname,
+    };
+    mbtiDataList.push(mbtiData);
+  });
+  let data = { mbtiDataList };
+  return data;
+
+  // return getUsersMbti.forEach((result) => {
+  //   return console.log(result.dataValues);
+  // });
+
+  //  return
 };
 
 /**

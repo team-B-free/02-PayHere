@@ -7,32 +7,44 @@ import { logger } from "../../config/winston.js";
  * @author 박성용
  * @version 1.0 22.7.6 최초 작성
  */
-const otherUsersMoneybooks = async (query) => {
+const anotherUsersMoneybooks = async (query) => {
   let type = parseInt(query.type, 10);
   let userId = parseInt(query.user_idx, 10);
 
   try {
-    const getOtherMoneybooks = await moneybookDetail.findAll({
+    const getAnotherMoneybooks = await moneybookDetail.findAll({
       where: { money_type: type },
-      attributes: {
-        exclude: ["createdAt", "updatedAt", "deletedAt"],
-        attributes: ["money_type", "money", "memo"],
-      },
+      attributes: ["id", "money_type", "money", "memo", "occured_at"],
+
       include: [
         {
           model: Moneybook,
-          attributes: ["title", "is_shared", "user_id"],
+          attributes: ["id", "title"],
+          exclude: ["created_At", "updated_At", "deleted_At"],
           where: { user_id: userId },
           required: true,
         },
       ],
     });
-    return getOtherMoneybooks;
+    let anotherMoneybookList = [];
+    getAnotherMoneybooks.forEach((data) => {
+      let otherUserMoneybooksData = {
+        moneybook_detail_id: data.dataValues.id,
+        type: data.dataValues.money_type,
+        money: data.dataValues.money,
+        memo: data.dataValues.memo,
+        occured_at: data.dataValues.occured_at,
+      };
+      anotherMoneybookList.push(otherUserMoneybooksData);
+    });
+
+    let data = { anotherMoneybookList };
+    return data;
   } catch (err) {
     logger.error(`에러발생:`, err);
   }
 };
 
 export default {
-  otherUsersMoneybooks,
+  anotherUsersMoneybooks,
 };
