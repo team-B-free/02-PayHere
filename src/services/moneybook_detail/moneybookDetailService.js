@@ -1,6 +1,6 @@
 import MoneybookDetail from "../../models/moneybookDetail.js";
 import Moneybook from "../../models/moneybook.js";
-import { getCurrentTime } from "../../modules/time.js";
+import { getCurrentTime, setConvertTime } from "../../modules/time.js";
 
 const moneybookDetailService = {
   createMoneybook: async (req) => {
@@ -17,13 +17,17 @@ const moneybookDetailService = {
       return 0;
     }
 
-    const { money, memo, money_type } = req.body;
+    const { moneybook_id } = req.params;
+    const { money, memo, money_type, occured_at } = req.body;
+    const occuredAt = setConvertTime(occured_at);
+
     try {
       const moneybook = await MoneybookDetail.create({
         money,
         memo,
         money_type,
-        moneybook_id: 55,
+        moneybook_id,
+        occured_at: occuredAt,
       });
       return moneybook;
     } catch (error) {
@@ -59,7 +63,20 @@ const moneybookDetailService = {
       order: [["createdAt", "DESC"]],
     });
 
-    return result;
+    let moneybookDetailInfo = JSON.parse(JSON.stringify(result));
+
+    const user_id = moneybookDetailInfo[0].MONEYBOOK.user_id;
+
+    for (let element of moneybookDetailInfo) {
+      delete element.MONEYBOOK;
+    }
+
+    let moneybookDetail = {
+      user_id: user_id,
+      moneybookDetailInfo: moneybookDetailInfo,
+    };
+
+    return moneybookDetail;
   },
   updateMoneybook: async (req) => {
     /**

@@ -1,4 +1,13 @@
 export const setConvertTime = (time) => {
+  const year = time.slice(0, 4);
+  const month = time.slice(4, 6);
+  const day = time.slice(-2);
+
+  const dateFormat = "".concat(year + "-" + month + "-" + day);
+
+  return dateFormat;
+};
+export const setConvertTimePeriod = (time) => {
   const { start_date, end_date } = time;
 
   if (start_date >= end_date) {

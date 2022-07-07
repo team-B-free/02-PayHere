@@ -33,7 +33,6 @@ const moneybookDetailController = {
     // const userInfo = req.userInfo;
     // 2.Header 토큰 정보
     const moneybook = await moneybookDetailService.readAllMoneybook(req);
-    console.log("moneybook: ", moneybook);
 
     if (moneybook === 0) {
       return res

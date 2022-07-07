@@ -1,6 +1,6 @@
 import User from "../../models/user.js";
 import Moneybook from "../../models/moneybook.js";
-import { setConvertTime } from "../../modules/time.js";
+import { setConvertTimePeriod } from "../../modules/time.js";
 
 const userService = {
   signupUser: async (req) => {
@@ -31,7 +31,7 @@ const userService = {
       return 0;
     }
 
-    const { startDate, endDate } = setConvertTime(req.query);
+    const { startDate, endDate } = setConvertTimePeriod(req.query);
 
     if (startDate === undefined || endDate === undefined) {
       return 0;
