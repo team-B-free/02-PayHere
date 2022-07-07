@@ -12,6 +12,9 @@ export const resignToken = {
     authorization: Joi.string().required(),
     refreshtoken: Joi.string().required()
   })
+  .options({
+    allowUnknown: true
+  }),
 };
 
 export const signUp = {
