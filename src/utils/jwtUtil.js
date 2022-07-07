@@ -4,7 +4,7 @@ dotenv.config();
 import { promisify } from 'util';
 import jwt from 'jsonwebtoken';
 import redisClient from '../config/redis.js';
-import { refreshStatus } from './constants.js';
+import { resignTokenStatus } from './constants.js';
 
 const jwtSecret = process.env.JWT_SECRET;
 
@@ -89,7 +89,7 @@ export const resignAccessToken = async (accessToken, refreshToken) => {
   const decoded = jwt.decode(accessToken);
 
   if (decoded === null){
-    return [refreshStatus.UNAUTHORIZED];
+    return [resignTokenStatus.UNAUTHORIZED];
   }
 
   const { userId } = decoded;
@@ -98,16 +98,16 @@ export const resignAccessToken = async (accessToken, refreshToken) => {
   if (accessTokenResult.message.includes('expires')){
     //토큰 재발급 시나리오1
     if (refreshTokenResult.ok === false){
-      return [refreshStatus.UNAUTHORIZED];
+      return [resignTokenStatus.UNAUTHORIZED];
     }
     //토큰 재발급 시나리오2
     else{
       const newAccessToken = signAccessToken(userId);
-      return [refreshStatus.RESIGN_ACCESS_TOKEN, newAccessToken];
+      return [resignTokenStatus.RESIGN_ACCESS_TOKEN, newAccessToken];
     }
   }
   //토큰 재발급 시나리오3
   else{
-    return [refreshStatus.UNNECESSARY];
+    return [resignTokenStatus.UNNECESSARY];
   }
 }
