@@ -1,3 +1,4 @@
+import bcrypt from 'bcrypt';
 import dotenv from 'dotenv';
 dotenv.config();
 import { logger } from '../../config/winston.js';
@@ -7,12 +8,10 @@ import { response, errResponse } from '../../utils/response.js';
 import message from '../../utils/responseMessage.js';
 import statusCode from '../../utils/statusCode.js';
 import { loginResponse, signUpResponse } from '../../utils/responseData.js';
-import bcrypt from 'bcrypt';
 import redisClient from '../../config/redis.js';
 import { resignAccessToken } from '../../utils/jwtUtil.js';
 import { resignTokenStatus } from '../../utils/constants.js';
 import { resignTokenResponse } from '../../utils/responseData.js';
-import { Op } from 'sequelize'; // 유사 검색을 위한 sequlize 기능 Op
 
 const login = async (email, password) => {
   try{
@@ -142,21 +141,29 @@ const resignToken = async (accessToken, refreshToken) => {
  * @author 강채현
  * @version 1.0
  * @param {string} userId userId
- * @returns {response} response 또는 errResponse 객체 
+ * @returns {array<number, response>} response 또는 errResponse 객체 
  */
  const getUser = async (userId) => {
-  // SELECT * FROM USER WHERE email='...' AND password='...';
   try {
     const user = await User.findByPk(userId);
 
     if(user) {
-      return response(statusCode.OK, message.SUCCESS, user);
+      return [
+        statusCode.OK,
+        response(statusCode.OK, message.SUCCESS, user)
+      ]
     } else {
-      return errResponse(statusCode.NO_CONTENT, message.NULL_VALUE);
+      return [
+        statusCode.NO_CONTENT,
+        errResponse(statusCode.NO_CONTENT, message.NO_CONTENT)
+      ]
     }
   } catch(err) {
     console.log(err);
-    return errResponse(statusCode.DB_ERROR, message.DB_ERROR);
+    return [
+      statusCode.DB_ERROR,
+      errResponse(statusCode.DB_ERROR, message.DB_ERROR)
+    ];
   }
 };
 
@@ -167,36 +174,55 @@ const resignToken = async (accessToken, refreshToken) => {
  * @param {string} newNickname 변경할 닉네임
  * @param {string} newMbti 변경할 mbti
  * @param {string} newPassword 변경할 비밀번호
- * @returns {response} response 또는 errResponse 객체 
+ * @returns {array<number, response>} response 또는 errResponse 객체
  */
-const editUser = async (user, newNickname = null, newMbti = null, newPassword = null) => {
+const editUser = async (userId ,newNickname = null, newMbti = null, newPassword = null) => {
   const dataToEdit = {
     newNickname,
     newMbti,
     newPassword
-  }
+  };
   const updatedData = [];
 
+  // (DB) USER SELECT query 및 Vaildation
+  const [statusCode, result] = getUser(userId);
+  if(!result.data) {
+    return [
+      statusCode,
+      result
+    ]
+  }
+
+  const user = result;
   // 데이터 삽입
   for(let key in dataToEdit) {
     if(user[key] === dataToEdit[key] || !dataToEdit[key]) {
       continue;
     } else {
       user[key] = dataToEdit[key];
-      updatedData.push({ [key]: dataToEdit[key] }); // 변경된 데이터, 현재 미사용
+      updatedData.push({ [key]: dataToEdit[key] }); // 변경된 데이터
     }
   }
 
   if(updatedData.length === 0) {
-    return errResponse(statusCode.BAD_REQUEST, message.BAD_REQUEST);
+    return [
+      statusCode.BAD_REQUEST,
+      errResponse(statusCode.BAD_REQUEST, message.BAD_REQUEST)
+    ]
   }
 
   try {
     await user.save(); // DB UPDATE
-    return response(statusCode.OK, message.SUCCESS);
+    return [
+      statusCode.OK,
+      response(statusCode.OK, message.SUCCESS)
+    ]
   } catch(err) {
     console.log(err);
-    return errResponse(statusCode.DB_ERROR, message.DB_ERROR);
+    return [
+      statusCode.DB_ERROR,
+      errResponse(statusCode.DB_ERROR, message.DB_ERROR)
+    ]
   }
 };
 
@@ -204,23 +230,38 @@ const editUser = async (user, newNickname = null, newMbti = null, newPassword = 
  * @author 강채현
  * @version 1.0
  * @param {User} user User 객체
- * @returns {response} response 또는 errResponse 객체 
+ * @returns {array<number, response>} response 또는 errResponse 객체
  */
-const deleteUser = async (user) => {
+const deleteUser = async (userId) => {
+  // (DB) USER SELECT query 및 Vaildation
+  const [statusCode, result] = getUser(userId);
+  if(!result.data) {
+    return [
+      statusCode,
+      result
+    ]
+  }
+
+  const user = result;
   try {
     // (models/user.js) paranoid:true => Soft delete
     await user.destroy({
       where: {
-        [Op.and]: [
-          { email: user.email, password: user.password }
-        ]
+        email: user.email,
+        password: user.password
       }
     });
 
-    return response(statusCode.OK, message.SUCCESS, {'deleted': user});
+    return [
+      statusCode.OK,
+      response(statusCode.OK, message.SUCCESS)
+    ]
   } catch(err) {
     console.log(err);
-    return errResponse(statusCode.DB_ERROR, message.DB_ERROR);
+    return [
+      statusCode.DB_ERROR,
+      errResponse(statusCode.DB_ERROR, message.DB_ERROR)
+    ]
   }
 };
 
