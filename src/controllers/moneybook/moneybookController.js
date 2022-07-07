@@ -31,6 +31,7 @@ const moneybookController = {
         .send(response(statusCode.OK, message.SUCCESS, result));
     } else {
       // 쿼리 요청이 mbti가 아니면 다음 함수로 이동 - > getOtherUsersMoneybook
+      // !라우터의 변경으로 필요 없어진 부분 삭제 예정
       next();
     }
   },
