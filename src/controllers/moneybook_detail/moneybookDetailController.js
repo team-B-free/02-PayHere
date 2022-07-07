@@ -1,5 +1,5 @@
 import moneybookDetailService from "../../services/moneybook_detail/moneybookDetailService.js";
-import { response } from "../../utils/response.js";
+import { errResponse } from "../../utils/response.js";
 import statusCode from "../../utils/statusCode.js";
 import message from "../../utils/responseMessage.js";
 
@@ -10,17 +10,19 @@ const moneybookDetailController = {
    */
   getAnotherUsersMoneybook: async (req, res) => {
     // eslint-disable-next-line no-unused-vars
-    let moneybook_id = req.params.moneybook_id; //1
-    let { type } = req.query; //1
-
-    let data = { moneybook_id, type };
-
-    const result = await moneybookDetailService.anotherUsersMoneybooks(data);
-
-    console.log("타인 가계부 조회 결과", result);
-    return res
-      .status(statusCode.OK)
-      .send(response(statusCode.OK, message.SUCCESS, result));
+    const { moneybook_id } = req.params;
+    const { type } = req.query; //1
+    const data = { moneybook_id, type };
+    try {
+      const result = await moneybookDetailService.anotherUsersMoneybooks(data);
+      return res.status(result.status).send(result);
+    } catch (err) {
+      console.log(err);
+      return [
+        statusCode.BAD_REQUEST,
+        errResponse(statusCode.BAD_REQUEST, message.INVALID_USER_INFO),
+      ];
+    }
   },
 };
 

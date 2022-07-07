@@ -1,40 +1,46 @@
 import Moneybook from "../../models/moneybook.js";
 import User from "../../models/user.js";
 import { logger } from "../../config/winston.js";
+import statusCode from "../../utils/statusCode.js";
+import message from "../../utils/responseMessage.js";
+import { response, errResponse } from "../../utils/response.js";
 
 /**
  * @author 박성용
  * @version 1.0 22.7.6 최초 작성
  */
 const mbtiMoneybook = async (mbti) => {
-  const getUsersMbti = await Moneybook.findAll({
-    where: { is_shared: "Y" },
-    attributes: ["id", "title", "is_shared", "view", "user_id"],
-
-    include: [
-      {
-        model: User,
-        attributes: ["mbti", "nickname"],
-        exclude: ["created_at", "updated_at", "deleted_at"],
-        where: { mbti: mbti },
-        required: true,
-      },
-    ],
-  });
-
-  let mbtiDataList = [];
-  getUsersMbti.forEach((data) => {
-    let mbtiData = {
-      moneybook_id: data.dataValues.id,
-      title: data.dataValues.title,
-      view: data.dataValues.view,
-      userId: data.dataValues.user_id,
-      nickname: data.dataValues.USER.dataValues.nickname,
-    };
-    mbtiDataList.push(mbtiData);
-  });
-  let data = { mbtiDataList };
-  return data;
+  try {
+    const getUsersMbti = await Moneybook.findAll({
+      where: { is_shared: "Y" },
+      attributes: ["id", "title", "is_shared", "view", "user_id"],
+      include: [
+        {
+          model: User,
+          attributes: ["mbti", "nickname"],
+          exclude: ["created_at", "updated_at", "deleted_at"],
+          where: { mbti: mbti },
+          required: true,
+        },
+      ],
+    });
+    let mbtiDataList = [];
+    getUsersMbti.forEach((data) => {
+      let mbtiData = {
+        moneybook_id: data.dataValues.id,
+        title: data.dataValues.title,
+        view: data.dataValues.view,
+        userId: data.dataValues.user_id,
+        nickname: data.dataValues.USER.dataValues.nickname,
+      };
+      mbtiDataList.push(mbtiData);
+    });
+    let data = { mbtiDataList };
+    return response(statusCode.OK, message.SUCCESS, data);
+  } catch (err) {
+    logger.error(`DB ERROR: ${err}`);
+    return errResponse(statusCode.DB_ERROR, message.DB_ERROR);
+  }
 };
 
 /**
@@ -42,12 +48,14 @@ const mbtiMoneybook = async (mbti) => {
  * @version 1.0 22.7.6 최초 작성
  */
 const deleteMoneybook = async (moneybook_id) => {
-  console.log("파라미터", moneybook_id);
   try {
-    await Moneybook.destroy({ where: { id: moneybook_id } });
-    return console.log("DELETE OK!");
+    await Moneybook.destroy({
+      where: { id: moneybook_id },
+    });
+    return response(statusCode.OK, message.SUCCESS);
   } catch (err) {
-    logger.error(`에러 발생:`, err);
+    logger.error(`DB ERROR: ${err}`);
+    return errResponse(statusCode.DB_ERROR, message.DB_ERROR);
   }
 };
 
@@ -56,9 +64,15 @@ const deleteMoneybook = async (moneybook_id) => {
  * @version 1.0 22.7.6 최초 작성
  */
 const restoreMoneybook = async (moneybook_id) => {
-  console.log("파라미터", moneybook_id);
-  await Moneybook.restore({ where: { id: moneybook_id } });
-  return console.log("RESTORE OK!");
+  try {
+    await Moneybook.restore({
+      where: { id: moneybook_id },
+    });
+    return response(statusCode.OK, message.SUCCESS);
+  } catch (err) {
+    logger.error(`DB ERROR: ${err}`);
+    return errResponse(statusCode.DB_ERROR, message.DB_ERROR);
+  }
 };
 
 export default {
