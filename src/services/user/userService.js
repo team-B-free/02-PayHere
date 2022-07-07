@@ -1,4 +1,4 @@
-import dotenv from "dotenv";
+import dotenv from 'dotenv';
 dotenv.config();
 
 import { logger } from '../../config/winston.js';
@@ -16,55 +16,61 @@ import { resignTokenResponse } from '../../utils/responseData.js';
 import { Op } from 'sequelize'; // 유사 검색을 위한 sequlize 기능 Op
 
 const login = async (email, password) => {
-  try {
+
+  try{
     const user = await User.findOne({
       where: { email },
-      attributes: ["id", "password"],
+      attributes: ['id', 'password']
     });
 
-    if (!user) {
+    if (!user){
       return [
         statusCode.BAD_REQUEST,
-        errResponse(statusCode.BAD_REQUEST, message.INVALID_USER_INFO),
+        errResponse(statusCode.BAD_REQUEST, message.INVALID_USER_INFO)
       ];
     }
 
-    const encodedPassword = user.getDataValue("password");
-    console.log(encodedPassword);
-    console.log(bcrypt.compareSync(password, encodedPassword));
-
+    const encodedPassword = user.getDataValue('password');
+    console.log(encodedPassword)
+    console.log(bcrypt.compareSync(password, encodedPassword))
+    
     const isValidPassword = bcrypt.compareSync(password, encodedPassword);
-    if (!isValidPassword) {
+    if (!isValidPassword){
       return [
         statusCode.BAD_REQUEST,
-        errResponse(statusCode.BAD_REQUEST, message.INVALID_USER_INFO),
+        errResponse(statusCode.BAD_REQUEST, message.INVALID_USER_INFO)
       ];
     }
 
-    const userId = user.getDataValue("id");
+    const userId = user.getDataValue('id');
     const { accessToken, refreshToken } = await signTokens(userId);
     const data = loginResponse(accessToken, refreshToken);
 
-    return [statusCode.OK, response(statusCode.OK, message.SUCCESS, data)];
-  } catch (err) {
+    return [
+      statusCode.OK,
+      response(statusCode.OK, message.SUCCESS, data)
+    ];
+
+  } catch(err){
     logger.error(`login Service Err: ${err}`);
     return [
       statusCode.DB_ERROR,
-      errResponse(statusCode.DB_ERROR, message.INTERNAL_SERVER_ERROR),
+      errResponse(statusCode.DB_ERROR, message.INTERNAL_SERVER_ERROR)
     ];
   }
 };
 
 const signUp = async (email, password, nickname) => {
-  try {
+
+  try{
     const isExistEmail = await User.findOne({
       where: { email },
     });
 
-    if (isExistEmail) {
+    if (isExistEmail){
       return [
         statusCode.BAD_REQUEST,
-        errResponse(statusCode.BAD_REQUEST, message.ALREADY_EXIST_EMAIL),
+        errResponse(statusCode.BAD_REQUEST, message.ALREADY_EXIST_EMAIL)
       ];
     }
 
@@ -72,31 +78,32 @@ const signUp = async (email, password, nickname) => {
       where: { nickname },
     });
 
-    if (isExistNickname) {
+    if (isExistNickname){
       return [
         statusCode.BAD_REQUEST,
-        errResponse(statusCode.BAD_REQUEST, message.ALREADY_EXIST_NICKNAME),
-      ];
+        errResponse(statusCode.BAD_REQUEST, message.ALREADY_EXIST_NICKNAME)
+      ]
     }
 
     const encryptedPassword = bcrypt.hashSync(password, 10);
 
-    const newUser = await User.create({
-      email,
-      password: encryptedPassword,
-      nickname,
-    });
+
+    const newUser = await User.create({email, password: encryptedPassword, nickname});
     const userId = newUser.user_id;
 
     const { accessToken, refreshToken } = await signTokens(userId);
     const data = signUpResponse(accessToken, refreshToken);
 
-    return [statusCode.OK, response(statusCode.OK, message.SUCCESS, data)];
-  } catch (err) {
+    return [
+      statusCode.OK,
+      response(statusCode.OK, message.SUCCESS, data)
+    ];
+
+  }catch(err){
     logger.error(`signUp Service Err: ${err}`);
     return [
       statusCode.DB_ERROR,
-      errResponse(statusCode.DB_ERROR, message.INTERNAL_SERVER_ERROR),
+      errResponse(statusCode.DB_ERROR, message.INTERNAL_SERVER_ERROR)
     ];
   }
 };
@@ -104,30 +111,36 @@ const signUp = async (email, password, nickname) => {
 const logout = async (userId) => {
   redisClient.del(String(userId));
 
-  return [statusCode.OK, response(statusCode.OK, message.SUCCESS)];
+  return [
+    statusCode.OK,
+    response(statusCode.OK, message.SUCCESS)
+  ];
 };
 
 const resignToken = async (accessToken, refreshToken) => {
-  const [result, newAccessToken] = await resignAccessToken(
-    accessToken,
-    refreshToken
-  );
+  const [result, newAccessToken] = await resignAccessToken(accessToken, refreshToken);
 
-  if (result === resignTokenStatus.RESIGN_ACCESS_TOKEN) {
+  if (result === resignTokenStatus.RESIGN_ACCESS_TOKEN){
+
     const data = resignTokenResponse(newAccessToken, refreshToken);
-    return [statusCode.OK, response(statusCode.SUCCESS, message.SUCCESS, data)];
-  } else if (result === resignTokenStatus.UNAUTHORIZED) {
     return [
-      statusCode.UNAUTHORIZED,
-      errResponse(statusCode.UNAUTHORIZED, message.FORBIDDEN),
-    ];
-  } else if (result === resignTokenStatus.UNNECESSARY) {
-    return [
-      statusCode.BAD_REQUEST,
-      errResponse(statusCode.BAD_REQUEST, message.REFRESH_TOKEN_UNNECESSARY),
+      statusCode.OK,
+      response(statusCode.SUCCESS, message.SUCCESS, data)
     ];
   }
-};
+  else if (result === resignTokenStatus.UNAUTHORIZED){
+    return [
+      statusCode.UNAUTHORIZED,
+      errResponse(statusCode.UNAUTHORIZED, message.FORBIDDEN)
+    ];
+  }
+  else if (result === resignTokenStatus.UNNECESSARY){
+    return [
+      statusCode.BAD_REQUEST,
+      errResponse(statusCode.BAD_REQUEST, message.REFRESH_TOKEN_UNNECESSARY)
+    ];
+  }
+}
 
 /** (DB) user 객체 반환
  * @author 강채현

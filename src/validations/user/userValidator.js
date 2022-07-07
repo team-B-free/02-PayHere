@@ -1,18 +1,19 @@
-import Joi from "joi";
+import Joi from 'joi';
 
 export const login = {
   body: Joi.object({
     email: Joi.string().required(),
-    password: Joi.string().required(),
-  }),
+    password: Joi.string().required()
+  })
 };
 
 export const resignToken = {
   headers: Joi.object({
     authorization: Joi.string().required(),
-    refreshtoken: Joi.string().required(),
-  }).options({
-    allowUnknown: true,
+    refreshtoken: Joi.string().required()
+  })
+  .options({
+    allowUnknown: true
   }),
 };
 
@@ -48,4 +49,3 @@ export const deleteUser = {
     allowUnknown: true
   })
 }
-

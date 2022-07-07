@@ -10,4 +10,5 @@ router.use("/moneybooks/moneybook_idx", MoneybookRouter);
 router.use("/moneybooks", MoneybookDetailRouter);
 router.use("/moneybooks/:idx", MoneybookDetailRouter);
 
+
 export default router;

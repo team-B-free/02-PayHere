@@ -1,6 +1,7 @@
 import { Router } from "express";
 import moneybookController from "./../../controllers/moneybook/moneybookController.js";
 const router = Router();
+
 /**
  * @author 오주환
  * @version 1.0 22.7.6 최초 작성 {문서 구조 작성}
@@ -15,5 +16,6 @@ const router = Router();
 router.get("/", moneybookController.getMbtiTypeMoneybook);
 router.delete("/:moneybook_id/status/", moneybookController.setDeleteMoneybook);
 router.patch("/recover/:moneybook_id", moneybookController.setRestoreMoneyBook);
+
 
 export default router;

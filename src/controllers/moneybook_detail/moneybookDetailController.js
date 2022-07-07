@@ -11,7 +11,7 @@ const moneybookDetailController = {
   getAnotherUsersMoneybook: async (req, res) => {
     // eslint-disable-next-line no-unused-vars
     const { moneybook_id } = req.params;
-    const { type } = req.query; //1
+    const { type } = req.query; 
     const data = { moneybook_id, type };
     try {
       const result = await moneybookDetailService.anotherUsersMoneybooks(data);
