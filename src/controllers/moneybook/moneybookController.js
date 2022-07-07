@@ -49,6 +49,7 @@ const moneybookController = {
         userId,
         moneybook_id
       );
+      console.log("결과값", delMoneybook);
       return res.status(delMoneybook.status).send(delMoneybook);
     } catch (err) {
       console.log(err);
@@ -63,12 +64,19 @@ const moneybookController = {
      * @author 박성용
      * @version 1.0 22.7.6
      * 가계부id 파라미터 요청시 해당 id의 가계부 복구
+     *
+     *  @author 박성용
+     * @version 1.1 22.7.8
+     * 로그인한 유저 정보를 받아 (로그인한)유저가 삭제한 내역이 있는 가계부 중
+     * (가계부id)파라미터 요청과 일치하는 가계부만 복원
      */
-    let { moneybook_id } = req.params;
+    const { userId } = req;
+    const { moneybook_id } = req.params;
 
     try {
       const recoverMoneybook = await moneybookService.restoreMoneybook(
-        moneybook_id
+        moneybook_id,
+        userId
       );
       return res.status(recoverMoneybook.status).send(recoverMoneybook);
     } catch (err) {

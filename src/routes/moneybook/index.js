@@ -23,15 +23,28 @@ router.delete(
 );
 /**
  *  @author 박성용
- *  @version 1.1 22.7.6 {가계부 삭제, 복구기능 patch 메서드 작성}
+ *  @version 1.0 22.7.6 가계부 삭제기능 patch 메서드 작성
  *
  *  @author 박성용
- *  @version 1.2 22.7.7 {가계부 삭제기능 delete 메서드로 변경}
+ *  @version 1.1 22.7.7 가계부 삭제기능 delete 메서드로 변경
  *
  *  @author 박성용
- *  @version 1.3 22.7.8 현재 로그인한 유저를 판단하기 위해 authJWT 적용
+ *  @version 1.2 22.7.8 현재 로그인한 유저를 판단하기 위해 authJWT 적용
  */
 
-router.patch("/recover/:moneybook_id", moneybookController.setRestoreMoneyBook);
-
+router.patch(
+  "/:moneybook_id/recover",
+  authJWT,
+  moneybookController.setRestoreMoneyBook
+);
+/**
+ *  @author 박성용
+ *  @version 1.0 22.7.6
+ * 가계부 복구기능 patch 메서드 작성
+ *
+ *  @author 박성용
+ *  @version 1.1 22.7.8
+ *  현재 로그인한 유저를 판단하기 위해 authJWT 적용
+ *  가계부 url을 피드백 받은 내용으로 변경
+ */
 export default router;

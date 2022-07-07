@@ -50,7 +50,7 @@ const deleteMoneybook = async (userId, moneybook_id) => {
    * 가계부id 파라미터 요청시 해당 id의 가계부 제거
    *
    * @author 박성용
-   * @version 1.2 22.7.8
+   * @version 1.1 22.7.8
    * 로그인한 유저 정보를 받아 (로그인한)유저가 생성한 가계부 내역 중 (가계부id)파라미터 요청과 일치하는 가계부만 제거
    */
 
@@ -67,38 +67,70 @@ const deleteMoneybook = async (userId, moneybook_id) => {
     };
     userDataList.push(setUserData);
   });
+  console.log(userDataList);
 
-  for (let key in userDataList) {
-    let id = userDataList[key].id;
-
+  for (let i = 0; i < userDataList.length; i++) {
+    console.log("moneybookID", userDataList[i].id);
+    console.log("pamraId", moneybook_id);
+    // 요청한 가계부id와 유저가 만든 가계부의 id가 일치하지 않는 경우
+    if (moneybook_id !== userDataList[i].id) {
+      errResponse(statusCode.BAD_REQUEST, message.BAD_REQUEST);
+    }
     // 가계부의 id와 요청한 가계부 id 파라미터와 같다면
     // 가계부 id에 해당하는 가계부를 삭제한다
-    if (id === parseInt(moneybook_id, 10)) {
+    if (userDataList[i].id === parseInt(moneybook_id, 10)) {
+      console.log("통과");
       await Moneybook.destroy({
-        where: { id: id },
+        where: { id: moneybook_id },
       });
       return response(statusCode.OK, message.SUCCESS);
-    }
-    // 요청한 가계부id와 유저가 만든 가계부의 id가 일치하지 않는 경우
-    else if (moneybook_id !== id) {
-      return errResponse(statusCode.BAD_REQUEST, message.BAD_REQUEST);
     }
   }
 };
 
-/**
- * @author 박성용
- * @version 1.0 22.7.6 최초 작성
- */
 const restoreMoneybook = async (moneybook_id, userId) => {
-  try {
-    await Moneybook.restore({
-      where: { id: moneybook_id },
-    });
-    return response(statusCode.OK, message.SUCCESS);
-  } catch (err) {
-    logger.error(`DB ERROR: ${err}`);
-    return errResponse(statusCode.DB_ERROR, message.DB_ERROR);
+  /**
+   * @author 박성용
+   * @version 1.0 22.7.6
+   * 가계부id 파라미터 요청시 해당 id의 가계부 제거
+   *
+   * @author 박성용
+   * @version 1.1 22.7.8
+   * 로그인한 유저 정보를 받아 (로그인한)유저가 삭제한 내역이 있는 가계부 중
+   * (가계부id)파라미터 요청과 일치하는 가계부만 복원
+   */
+  const userData = await Moneybook.findAll({
+    where: { user_id: userId },
+    attributes: ["id", "title", "user_id", "deleted_at"],
+    paranoid: false,
+  });
+  let userDataList = [];
+  userData.forEach((data) => {
+    let setUserData = {
+      id: data.dataValues.id,
+      user_id: data.dataValues.user_id,
+      title: data.dataValues.title,
+      deleted_at: data.dataValues.deleted_at,
+    };
+    userDataList.push(setUserData);
+  });
+
+  for (let key in userDataList) {
+    let id = userDataList[key].id;
+    let deleteAt = userDataList[key].deleted_at;
+
+    // 요청한 가계부id와 유저가 만든 가계부의 id가 일치하지 않는 경우
+    if (parseInt(moneybook_id, 10) !== id) {
+      errResponse(statusCode.BAD_REQUEST, message.BAD_REQUEST);
+    }
+    // 가계부의 id와 요청한 가계부 id 파라미터와 같고, 삭제된 이력이 있다면
+    // 가계부 id에 해당하는 가계부를 복구한다
+    if (id === parseInt(moneybook_id, 10) && deleteAt !== "") {
+      await Moneybook.restore({
+        where: { id: id },
+      });
+      return response(statusCode.OK, message.SUCCESS);
+    }
   }
 };
 
