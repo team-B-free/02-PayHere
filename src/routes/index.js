@@ -5,8 +5,8 @@ import MoneybookRouter from "./moneybook/index.js";
 import MoneybookDetailRouter from "./moneybook_detail/index.js";
 
 router.use("/users", userRouter);
-router.use("/moneybook", MoneybookRouter);
-router.use("/moneybook", MoneybookRouter);
+router.use("/moneybooks", MoneybookRouter);
+router.use("/moneybooks", MoneybookRouter);
 router.use("/moneybook/:idx", MoneybookDetailRouter);
 
 
