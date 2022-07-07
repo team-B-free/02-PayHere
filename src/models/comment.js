@@ -19,13 +19,13 @@ class Comment extends Model {
         timestamps: true, //createdAt, updatedAt 컬럼 자동 추가
         paranoid: true, //deletedAt 컬럼 자동 추가
         underscored: true, //컬럼명 스네이크 형식으로 변경
-      }
+      },
     );
   }
 
   static associate(db) {
-    db.Comment.belongsTo(db.Moneybook, {
-      foreignKey: "moneybook_id",
+    db.Comment.hasMany(db.Moneybook, {
+      foreignKey: "comment_id",
       allowNull: false,
     });
   }

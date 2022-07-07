@@ -29,7 +29,7 @@ class Moneybook extends Model {
         timestamps: true, //createdAt, updatedAt 컬럼 자동 추가
         paranoid: true, //deletedAt 컬럼 자동 추가
         underscored: true, //컬럼명 스네이크 형식으로 변경
-      }
+      },
     );
   }
 
@@ -38,8 +38,8 @@ class Moneybook extends Model {
       foreignKey: "moneybook_id",
       allowNull: false,
     });
-    db.Moneybook.hasMany(db.Comment, {
-      foreignKey: "moneybook_id",
+    db.Moneybook.belongsTo(db.Comment, {
+      foreignKey: "comment_id",
       allowNull: false,
     });
     db.Moneybook.belongsTo(db.User, {

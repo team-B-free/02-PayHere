@@ -9,7 +9,7 @@ import { resignTokenStatus } from "./constants.js";
 const jwtSecret = process.env.JWT_SECRET;
 
 //access token 발급
-export const signAccessToken = (userId) => {
+export const signAccessToken = userId => {
   const payload = {
     userId,
   };
@@ -21,7 +21,7 @@ export const signAccessToken = (userId) => {
 };
 
 //access token 검증
-export const verifyAccessToken = (token) => {
+export const verifyAccessToken = token => {
   let decoded = null;
   try {
     decoded = jwt.verify(token, jwtSecret);
@@ -68,7 +68,7 @@ export const verifyRefreshToken = async (token, userId) => {
 };
 
 //access token, refresh token 발급
-export const signTokens = async (userId) => {
+export const signTokens = async userId => {
   const accessToken = signAccessToken(userId);
   const refreshToken = signRefreshToken();
 

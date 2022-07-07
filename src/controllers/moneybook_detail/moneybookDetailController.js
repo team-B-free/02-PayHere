@@ -56,7 +56,7 @@ const moneybookDetailController = {
         .send(errResponse(statusCode.UNAUTHORIZED, message.UNAUTHORIZED));
     } else if (moneybook.length === 0) {
       return res.json(
-        response(statusCode.NO_CONTENT, message.NO_CONTENT, moneybook)
+        response(statusCode.NO_CONTENT, message.NO_CONTENT, moneybook),
       );
     } else {
       return res
@@ -73,7 +73,7 @@ const moneybookDetailController = {
 
     if (moneybook === -1) {
       return res.send(
-        errResponse(statusCode.UNAUTHORIZED, message.UNAUTHORIZED)
+        errResponse(statusCode.UNAUTHORIZED, message.UNAUTHORIZED),
       );
     } else if (moneybook[0] === 0) {
       return res.send(errResponse(statusCode.NO_CONTENT, message.NO_CONTENT));
@@ -93,7 +93,7 @@ const moneybookDetailController = {
 
     if (moneybook === 0) {
       return res.send(
-        errResponse(statusCode.UNAUTHORIZED, message.UNAUTHORIZED)
+        errResponse(statusCode.UNAUTHORIZED, message.UNAUTHORIZED),
       );
     } else if (moneybook === -1) {
       return res.send(errResponse(statusCode.NO_CONTENT, message.NO_CONTENT));
@@ -115,7 +115,7 @@ const moneybookDetailController = {
       return res.send(errResponse(statusCode.NO_CONTENT, message.NO_CONTENT));
     } else if (moneybook === -1) {
       return res.send(
-        errResponse(statusCode.UNAUTHORIZED, message.UNAUTHORIZED)
+        errResponse(statusCode.UNAUTHORIZED, message.UNAUTHORIZED),
       );
     } else {
       return res

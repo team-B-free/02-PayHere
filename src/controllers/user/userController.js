@@ -16,15 +16,36 @@ const userController = {
       new_password: newPassword,
     } = req.body;
 
-    // (DB) USER UPDATE query 및 Validation
-    const [statusCode, result] = userService.editUser(
-      userId,
-      newNickName,
-      newMbti,
-      newPassword
-    );
+    try {
+      // (DB) USER SELECT query 및 Vaildation
+      const userInfo = userService.getUser(userId);
+      if (!userInfo.data) {
+        return res.status(userInfo.status).send(userInfo);
+      }
 
-    return res.status(statusCode).send(result);
+      // (DB) USER UPDATE query 및 Validation
+      const editResultInfo = userService.editUser(
+        userInfo.data,
+        newNickName,
+        newMbti,
+        newPassword,
+      );
+      if (!editResultInfo.data) {
+        return res.status(editResultInfo.status).send(editResultInfo);
+      }
+
+      return res.status(editResultInfo.status).send(editResultInfo);
+    } catch (err) {
+      console.log(err);
+      return res
+        .status(statusCode.INTERNAL_SERVER_ERROR)
+        .send(
+          errResponse(
+            statusCode.INTERNAL_SERVER_ERROR,
+            message.INTERNAL_SERVER_ERROR,
+          ),
+        );
+    }
   },
 
   /** 회원정보 삭제 API
@@ -34,12 +55,32 @@ const userController = {
   deleteUser: async (req, res) => {
     const { userId } = req;
 
-    // (DB) USER DELETE query 및 Vaildation
-    const [statusCode, result] = await userService.deleteUser(userId);
+    try {
+      // (DB) USER SELECT query 및 Vaildation
+      const userInfo = userService.getUser(userId);
+      if (!userInfo.data) {
+        return res.status(userInfo.status).send(userInfo);
+      }
 
-    return res.status(statusCode).send(result);
+      // (DB) USER DELETE query 및 Vaildation
+      const delResultInfo = await userService.deleteUser(userInfo.data);
+      if (!delResultInfo.data) {
+        return res.status(delResultInfo.status).send(delResultInfo);
+      }
+
+      return res.status(delResultInfo.status).send(delResultInfo);
+    } catch (err) {
+      console.log(err);
+      return res
+        .status(statusCode.INTERNAL_SERVER_ERROR)
+        .send(
+          errResponse(
+            statusCode.INTERNAL_SERVER_ERROR,
+            message.INTERNAL_SERVER_ERROR,
+          ),
+        );
+    }
   },
-
   login: async (req, res) => {
     const { email, password } = req.body;
     const [statusCode, result] = await userService.login(email, password);
@@ -53,7 +94,7 @@ const userController = {
 
     const [statusCode, result] = await userService.resignToken(
       accessToken,
-      refreshToken
+      refreshToken,
     );
 
     return res.status(statusCode).send(result);
@@ -61,11 +102,10 @@ const userController = {
 
   signUp: async (req, res) => {
     const { email, password, nickname } = req.body;
-
     const [statusCode, result] = await userService.signUp(
       email,
       password,
-      nickname
+      nickname,
     );
 
     return res.status(statusCode).send(result);
@@ -91,7 +131,7 @@ const userController = {
         .send(errResponse(statusCode.UNAUTHORIZED, message.UNAUTHORIZED));
     } else if (moneybook.length === 0) {
       return res.json(
-        response(statusCode.NO_CONTENT, message.NO_CONTENT, moneybook)
+        response(statusCode.NO_CONTENT, message.NO_CONTENT, moneybook),
       );
     } else {
       return res

@@ -28,11 +28,11 @@ router.delete("/:moneybook_id", moneybookDetailController.deleteMoneybook);
  */
 router.patch(
   "/recovery/:moneybook_id",
-  moneybookDetailController.recoverMoneybook
+  moneybookDetailController.recoverMoneybook,
 );
 router.get(
   "/:moneybook_id",
-  moneybookDetailController.getAnotherUsersMoneybook
+  moneybookDetailController.getAnotherUsersMoneybook,
 );
 
 export default router;
