@@ -24,8 +24,8 @@ class Comment extends Model {
   }
 
   static associate(db) {
-    db.Comment.hasMany(db.Moneybook, {
-      foreignKey: "comment_id",
+    db.Comment.belongsTo(db.Moneybook, {
+      foreignKey: "moneybook_id",
       allowNull: false,
     });
   }

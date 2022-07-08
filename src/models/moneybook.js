@@ -38,8 +38,8 @@ class Moneybook extends Model {
       foreignKey: "moneybook_id",
       allowNull: false,
     });
-    db.Moneybook.belongsTo(db.Comment, {
-      foreignKey: "comment_id",
+    db.Moneybook.hasMany(db.Comment, {
+      foreignKey: "moneybook_id",
       allowNull: false,
     });
     db.Moneybook.belongsTo(db.User, {

@@ -21,6 +21,7 @@ router.patch("/:moneybook_id", moneybookController.updateMoneybook);
 router.get("/", moneybookController.getMbtiTypeMoneybook);
 router.patch("/recover/:moneybook_id", moneybookController.setRestoreMoneyBook);
 router.delete("/:moneybook_id/status/", moneybookController.setDeleteMoneybook);
+
 //댓글 생성
 router.post("/comments", commentController.createComment);
 //댓글 수정
