@@ -28,6 +28,11 @@ class Comment extends Model {
       foreignKey: "moneybook_id",
       allowNull: false,
     });
+
+    db.Comment.belongsTo(db.Comment, {
+      foreignKey: "user_id",
+      allowNull: false,
+    });
   }
 }
 

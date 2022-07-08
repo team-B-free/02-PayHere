@@ -37,6 +37,7 @@ class User extends Model {
 
   static associate(db) {
     db.User.hasMany(db.Moneybook, { foreignKey: "user_id", allowNull: false });
+    db.User.hasMany(db.Comment, { foreignKey: "user_id", allowNull: false });
   }
 }
 
