@@ -1,7 +1,7 @@
-import moneybookDetailService from "../../services/moneybook_detail/moneybookDetailService.js";
-import statusCode from "./../../utils/statusCode.js";
-import message from "./../../utils/responseMessage.js";
-import { errResponse, response } from "./../../utils/response.js";
+import moneybookDetailService from '../../services/moneybook_detail/moneybookDetailService.js';
+import statusCode from './../../utils/statusCode.js';
+import message from './../../utils/responseMessage.js';
+import { errResponse, response } from './../../utils/response.js';
 
 const moneybookDetailController = {
   createMoneybook: async (req, res) => {
@@ -9,6 +9,7 @@ const moneybookDetailController = {
      * @author 오주환
      * @version 1.0 22.07.06 가계부 상세내역 추가
      */
+    console.log(moneybookDetailService);
     const moneybook = await moneybookDetailService.createMoneybook(req);
 
     if (moneybook === 0) {
@@ -23,15 +24,19 @@ const moneybookDetailController = {
         .send(response(statusCode.CREATED, message.SUCCESS, moneybook));
     }
   },
-  /**
-   * @author 박성용
-   * @version 1.0 22.7.6 최초 작성
-   */
+
   getAnotherUsersMoneybook: async (req, res) => {
+    /**
+     * @author 박성용
+     * @version 1.0 22.7.6 최초 작성
+     * 다른 유저들의 가계부 정보를 가져옵니다
+     */
+
     // eslint-disable-next-line no-unused-vars
-    const { moneybook_id } = req.params;
+    const { userId } = req;
     const { type } = req.query;
-    const data = { moneybook_id, type };
+    const data = { userId, type };
+
     try {
       const result = await moneybookDetailService.anotherUsersMoneybooks(data);
       return res.status(result.status).send(result);
@@ -56,7 +61,7 @@ const moneybookDetailController = {
         .send(errResponse(statusCode.UNAUTHORIZED, message.UNAUTHORIZED));
     } else if (moneybook.length === 0) {
       return res.json(
-        response(statusCode.NO_CONTENT, message.NO_CONTENT, moneybook)
+        response(statusCode.NO_CONTENT, message.NO_CONTENT, moneybook),
       );
     } else {
       return res
@@ -73,7 +78,7 @@ const moneybookDetailController = {
 
     if (moneybook === -1) {
       return res.send(
-        errResponse(statusCode.UNAUTHORIZED, message.UNAUTHORIZED)
+        errResponse(statusCode.UNAUTHORIZED, message.UNAUTHORIZED),
       );
     } else if (moneybook[0] === 0) {
       return res.send(errResponse(statusCode.NO_CONTENT, message.NO_CONTENT));
@@ -89,11 +94,11 @@ const moneybookDetailController = {
      * @version 1.0 22.07.07 가계부 상세내역 삭제
      */
     const moneybook = await moneybookDetailService.deleteMoneybook(req);
-    console.log("moneybook: ", moneybook);
+    console.log('moneybook: ', moneybook);
 
     if (moneybook === 0) {
       return res.send(
-        errResponse(statusCode.UNAUTHORIZED, message.UNAUTHORIZED)
+        errResponse(statusCode.UNAUTHORIZED, message.UNAUTHORIZED),
       );
     } else if (moneybook === -1) {
       return res.send(errResponse(statusCode.NO_CONTENT, message.NO_CONTENT));
@@ -109,13 +114,13 @@ const moneybookDetailController = {
      * @version 1.0 22.07.07 가계부 상세내역 복구
      */
     const moneybook = await moneybookDetailService.recoverMoneybook(req);
-    console.log("moneybook: ", moneybook);
+    console.log('moneybook: ', moneybook);
 
     if (moneybook === 0) {
       return res.send(errResponse(statusCode.NO_CONTENT, message.NO_CONTENT));
     } else if (moneybook === -1) {
       return res.send(
-        errResponse(statusCode.UNAUTHORIZED, message.UNAUTHORIZED)
+        errResponse(statusCode.UNAUTHORIZED, message.UNAUTHORIZED),
       );
     } else {
       return res
