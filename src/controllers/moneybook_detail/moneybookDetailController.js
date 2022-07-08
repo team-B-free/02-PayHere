@@ -4,6 +4,17 @@ import message from "./../../utils/responseMessage.js";
 import { errResponse, response } from "./../../utils/response.js";
 
 const moneybookDetailController = {
+  /**
+   * @author 최예진
+   * @version 1.0 22.07.08 가계부 상세내역 조회
+   */
+  getMoneybookDetail: async (req, res) => {
+    const { moneybook_id: moneybookId } = req.params;
+    const [statusCode, result] =
+      await moneybookDetailService.getMoneybookDetail(moneybookId);
+
+    return res.status(statusCode).send(result);
+  },
   createMoneybook: async (req, res) => {
     /**
      * @author 오주환

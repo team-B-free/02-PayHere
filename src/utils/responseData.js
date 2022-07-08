@@ -19,4 +19,17 @@ const signUpResponse = (accessToken, refreshToken) => {
   };
 };
 
-export { loginResponse, resignTokenResponse, signUpResponse };
+const getMoneybookDetailResponse = (moneybookOwnerId, detail, comments) => {
+  return {
+    user_id: moneybookOwnerId,
+    moneybook_detail: detail,
+    comments,
+  };
+};
+
+export {
+  loginResponse,
+  resignTokenResponse,
+  signUpResponse,
+  getMoneybookDetailResponse,
+};

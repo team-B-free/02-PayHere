@@ -2,11 +2,74 @@ import Moneybook from "../../models/moneybook.js";
 import Comment from "../../models/comment.js";
 import { getCurrentTime, setConvertTime } from "../../modules/time.js";
 import moneybookDetail from "../../models/moneybookDetail.js";
+import comment from "../../models/comment.js";
+import moneybook from "../../models/moneybook.js";
 import { logger } from "../../config/winston.js";
 import statusCode from "../../utils/statusCode.js";
 import message from "../../utils/responseMessage.js";
 import { response, errResponse } from "../../utils/response.js";
+import { getMoneybookDetailResponse } from "../../utils/responseData.js";
 
+/**
+ * @author 최예진
+ * @version 1.0 22.07.08 가계부 상세내역 조회
+ */
+const getMoneybookDetail = async moneybookId => {
+  try {
+    const moneybookOwner = await moneybook.findOne({
+      where: { id: moneybookId },
+      attributes: ["user_id"],
+    });
+
+    const moneybookOwnerId = moneybookOwner.getDataValue("user_id");
+
+    const moneybookDetailArr = await moneybookDetail.findAll({
+      where: {
+        moneybook_id: moneybookId,
+      },
+      attributes: ["id", "money", "memo", "money_type", "occured_at"],
+      order: [["occured_at", "ASC"]],
+    });
+
+    const commentArr = await comment.findAll({
+      where: {
+        moneybook_id: moneybookId,
+      },
+      attributes: ["id", "content", "created_at"],
+    });
+
+    const detail = [];
+    const comments = [];
+
+    moneybookDetailArr.forEach(item => {
+      detail.push({
+        id: item.id,
+        money: item.money,
+        memo: item.memo,
+        money_type: item.money_type,
+        occured_at: item.occured_at,
+      });
+    });
+
+    commentArr.forEach(item => {
+      comments.push({
+        id: item.id,
+        content: item.content,
+        created_at: item.created_at,
+      });
+    });
+
+    const data = getMoneybookDetailResponse(moneybookOwnerId, detail, comments);
+
+    return [statusCode.OK, response(statusCode.OK, message.SUCCESS, data)];
+  } catch (error) {
+    logger.error(`signUp Service Err: ${error}`);
+    return [
+      statusCode.DB_ERROR,
+      errResponse(statusCode.DB_ERROR, message.INTERNAL_SERVER_ERROR),
+    ];
+  }
+};
 const createMoneybook = async req => {
   /**
    * @author 오주환
@@ -168,6 +231,7 @@ const anotherUsersMoneybooks = async query => {
 };
 
 export default {
+  getMoneybookDetail,
   anotherUsersMoneybooks,
   recoverMoneybook,
   readAllMoneybook,
