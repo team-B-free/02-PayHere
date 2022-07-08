@@ -54,27 +54,6 @@ const moneybookDetailController = {
       ];
     }
   },
-  readAllMoneybook: async (req, res) => {
-    /**
-     * @author 오주환
-     * @version 1.0 22.07.07 가계부 상세내역 조회
-     */
-    const moneybook = await moneybookDetailService.readAllMoneybook(req);
-
-    if (moneybook === 0) {
-      return res
-        .status(statusCode.UNAUTHORIZED)
-        .send(errResponse(statusCode.UNAUTHORIZED, message.UNAUTHORIZED));
-    } else if (moneybook.length === 0) {
-      return res.json(
-        response(statusCode.NO_CONTENT, message.NO_CONTENT, moneybook),
-      );
-    } else {
-      return res
-        .status(statusCode.CREATED)
-        .send(response(statusCode.CREATED, message.SUCCESS, moneybook));
-    }
-  },
   updateMoneybook: async (req, res) => {
     /**
      * @author 오주환

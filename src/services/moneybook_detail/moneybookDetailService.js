@@ -1,5 +1,4 @@
 import Moneybook from "../../models/moneybook.js";
-import Comment from "../../models/comment.js";
 import { getCurrentTime, setConvertTime } from "../../modules/time.js";
 import moneybookDetail from "../../models/moneybookDetail.js";
 import comment from "../../models/comment.js";
@@ -99,45 +98,6 @@ const createMoneybook = async req => {
   } catch (error) {
     console.error(error);
   }
-};
-const readAllMoneybook = async req => {
-  /**
-   * @author 오주환
-   * @version 1.0 22.07.07 가계부 상세내역 조회
-   */
-  const { moneybook_id } = req.params;
-
-  const result = await moneybookDetail.findAll({
-    where: {
-      moneybook_id,
-    },
-    include: [
-      {
-        model: Moneybook,
-        attributes: ["user_id"],
-      },
-      {
-        model: Comment,
-        attributes: ["content"],
-      },
-    ],
-    order: [["createdAt", "DESC"]],
-  });
-
-  let moneybookDetailInfo = JSON.parse(JSON.stringify(result));
-
-  const user_id = moneybookDetailInfo[0].MONEYBOOK.user_id;
-
-  for (let element of moneybookDetailInfo) {
-    delete element.MONEYBOOK;
-  }
-
-  let moneybookDetail = {
-    user_id: user_id,
-    moneybookDetailInfo: moneybookDetailInfo,
-  };
-
-  return moneybookDetail;
 };
 const updateMoneybook = async req => {
   /**
@@ -242,7 +202,6 @@ export default {
   getMoneybookDetail,
   anotherUsersMoneybooks,
   recoverMoneybook,
-  readAllMoneybook,
   createMoneybook,
   updateMoneybook,
   deleteMoneybook,
