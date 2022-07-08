@@ -171,7 +171,7 @@ const createMoneybook = async req => {
  * @author 강채현
  * @version 1.0
  * @param {string} userId userId
- * @returns {array<number, response>} response 또는 errResponse 객체
+ * @returns {array} response 또는 errResponse 객체
  */
 const getUser = async userId => {
   try {
@@ -217,12 +217,12 @@ const editUser = async (
   const updatedData = [];
 
   // (DB) USER SELECT query 및 Vaildation
-  const [statusCode, result] = getUser(userId);
+  const [status, result] = await getUser(userId);
   if (!result.data) {
-    return [statusCode, result];
+    return [status, result];
   }
 
-  const user = result;
+  const user = result.data;
   // 데이터 삽입
   for (let key in dataToEdit) {
     if (user[key] === dataToEdit[key] || !dataToEdit[key]) {
@@ -260,12 +260,12 @@ const editUser = async (
  */
 const deleteUser = async userId => {
   // (DB) USER SELECT query 및 Vaildation
-  const [statusCode, result] = getUser(userId);
+  const [status, result] = await getUser(userId);
   if (!result.data) {
-    return [statusCode, result];
+    return [status, result];
   }
 
-  const user = result;
+  const user = result.data;
   try {
     // (models/user.js) paranoid:true => Soft delete
     await user.destroy({
