@@ -18,6 +18,9 @@ const message = {
   //회원가입 관련
   ALREADY_EXIST_EMAIL: "이미 존재하는 이메일",
   ALREADY_EXIST_NICKNAME: "이미 존재하는 닉네임",
+
+  //가계부 상세 관련
+  INVALID_MONEYBOOK_ID: "존재하지 않는 moneybook_id",
 };
 
 export default message;

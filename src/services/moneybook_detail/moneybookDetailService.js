@@ -21,6 +21,13 @@ const getMoneybookDetail = async moneybookId => {
       attributes: ["user_id"],
     });
 
+    if (!moneybookOwner) {
+      return [
+        statusCode.BAD_REQUEST,
+        errResponse(statusCode.BAD_REQUEST, message.INVALID_MONEYBOOK_ID),
+      ];
+    }
+
     const moneybookOwnerId = moneybookOwner.getDataValue("user_id");
 
     const moneybookDetailArr = await moneybookDetail.findAll({
@@ -35,7 +42,7 @@ const getMoneybookDetail = async moneybookId => {
       where: {
         moneybook_id: moneybookId,
       },
-      attributes: ["id", "content", "created_at"],
+      attributes: ["id", "content", "created_at", "user_id"],
     });
 
     const detail = [];
@@ -54,6 +61,7 @@ const getMoneybookDetail = async moneybookId => {
     commentArr.forEach(item => {
       comments.push({
         id: item.id,
+        user_id: item.user_id,
         content: item.content,
         created_at: item.created_at,
       });
