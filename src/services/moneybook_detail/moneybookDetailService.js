@@ -1,135 +1,168 @@
 import Moneybook from "../../models/moneybook.js";
 import { getCurrentTime, setConvertTime } from "../../modules/time.js";
 import moneybookDetail from "../../models/moneybookDetail.js";
+import comment from "../../models/comment.js";
+import moneybook from "../../models/moneybook.js";
 import { logger } from "../../config/winston.js";
 import statusCode from "../../utils/statusCode.js";
 import message from "../../utils/responseMessage.js";
 import { response, errResponse } from "../../utils/response.js";
+import { getMoneybookDetailResponse } from "../../utils/responseData.js";
 
-export const moneybookDetailService = {
-  createMoneybook: async (req) => {
-    /**
-     * @author 오주환
-     * @version 1.0 22.07.07 가계부 상세내역
-     */
-    const { moneybook_id } = req.params;
-    const { money, memo, money_type, occured_at } = req.body;
-    const occuredAt = setConvertTime(occured_at);
+/**
+ * @author 최예진
+ * @version 1.0 22.07.08 가계부 상세내역 조회
+ */
+const getMoneybookDetail = async moneybookId => {
+  try {
+    const moneybookOwner = await moneybook.findOne({
+      where: { id: moneybookId },
+      attributes: ["user_id"],
+    });
 
-    try {
-      const moneybook = await moneybookDetail.create({
-        money,
-        memo,
-        money_type,
-        moneybook_id,
-        occured_at: occuredAt,
-      });
-      return moneybook;
-    } catch (error) {
-      console.error(error);
+    if (!moneybookOwner) {
+      return [
+        statusCode.BAD_REQUEST,
+        errResponse(statusCode.BAD_REQUEST, message.INVALID_MONEYBOOK_ID),
+      ];
     }
-  },
-  readAllMoneybook: async (req) => {
-    /**
-     * @author 오주환
-     * @version 1.0 22.07.07 가계부 상세내역 조회
-     */
-    const { moneybook_id } = req.params;
 
-    const result = await moneybookDetail.findAll({
+    const moneybookOwnerId = moneybookOwner.getDataValue("user_id");
+
+    const moneybookDetailArr = await moneybookDetail.findAll({
       where: {
-        moneybook_id,
+        moneybook_id: moneybookId,
       },
-      include: [
-        {
-          model: Moneybook,
-          attributes: ["user_id"],
-        },
-      ],
-      order: [["createdAt", "DESC"]],
+      attributes: ["id", "money", "memo", "money_type", "occured_at"],
+      order: [["occured_at", "ASC"]],
     });
 
-    let moneybookDetailInfo = JSON.parse(JSON.stringify(result));
-
-    const user_id = moneybookDetailInfo[0].MONEYBOOK.user_id;
-
-    for (let element of moneybookDetailInfo) {
-      delete element.MONEYBOOK;
-    }
-
-    let moneybookDetail = {
-      user_id: user_id,
-      moneybookDetailInfo: moneybookDetailInfo,
-    };
-
-    return moneybookDetail;
-  },
-  updateMoneybook: async (req) => {
-    /**
-     * @author 오주환
-     * @version 1.0 22.07.07 가계부 상세내역 수정
-     */
-    const { moneybook_id } = req.params;
-    const { money, memo, money_type } = req.body;
-    const authorization = req.header("Authorization");
-
-    if (authorization === undefined) {
-      return 0;
-    }
-
-    const moneybook = await moneybookDetail.update(
-      {
-        money,
-        memo,
-        money_type,
+    const commentArr = await comment.findAll({
+      where: {
+        moneybook_id: moneybookId,
       },
-      {
-        where: { id: moneybook_id },
-      }
-    );
-
-    return moneybook;
-  },
-  deleteMoneybook: async (req) => {
-    /**
-     * @author 오주환
-     * @version 1.0 22.07.07 가계부 상세내역 삭제
-     */
-    const { moneybook_id } = req.params;
-    const currentTime = getCurrentTime();
-
-    const moneybook = await moneybookDetail.update(
-      {
-        deletedAt: currentTime,
-      },
-      {
-        where: { id: moneybook_id },
-      }
-    );
-
-    return moneybook;
-  },
-  recoverMoneybook: async (req) => {
-    /**
-     * @author 오주환
-     * @version 1.0 22.07.07 가계부 상세내역 복구
-     */
-    const { moneybook_id } = req.params;
-    console.log(moneybook_id);
-
-    const moneybook = await moneybookDetail.restore({
-      where: { id: moneybook_id },
+      attributes: ["id", "content", "created_at", "user_id"],
     });
 
-    return moneybook;
-  },
+    const detail = [];
+    const comments = [];
+
+    moneybookDetailArr.forEach(item => {
+      detail.push({
+        id: item.id,
+        money: item.money,
+        memo: item.memo,
+        money_type: item.money_type,
+        occured_at: item.occured_at,
+      });
+    });
+
+    commentArr.forEach(item => {
+      comments.push({
+        id: item.id,
+        user_id: item.user_id,
+        content: item.content,
+        created_at: item.created_at,
+      });
+    });
+
+    const data = getMoneybookDetailResponse(moneybookOwnerId, detail, comments);
+
+    return [statusCode.OK, response(statusCode.OK, message.SUCCESS, data)];
+  } catch (error) {
+    logger.error(`signUp Service Err: ${error}`);
+    return [
+      statusCode.DB_ERROR,
+      errResponse(statusCode.DB_ERROR, message.INTERNAL_SERVER_ERROR),
+    ];
+  }
 };
+const createMoneybook = async req => {
+  /**
+   * @author 오주환
+   * @version 1.0 22.07.07 가계부 상세내역
+   */
+  const { moneybook_id } = req.params;
+  const { money, memo, money_type, occured_at } = req.body;
+  const occuredAt = setConvertTime(occured_at);
 
+  try {
+    const moneybook = await moneybookDetail.create({
+      money,
+      memo,
+      money_type,
+      moneybook_id,
+      occured_at: occuredAt,
+    });
+    return moneybook;
+  } catch (error) {
+    console.error(error);
+  }
+};
+const updateMoneybook = async req => {
+  /**
+   * @author 오주환
+   * @version 1.0 22.07.07 가계부 상세내역 수정
+   */
+  const { moneybook_id } = req.params;
+  const { money, memo, money_type } = req.body;
+  const authorization = req.header("Authorization");
+
+  if (authorization === undefined) {
+    return 0;
+  }
+
+  const moneybook = await moneybookDetail.update(
+    {
+      money,
+      memo,
+      money_type,
+    },
+    {
+      where: { id: moneybook_id },
+    },
+  );
+
+  return moneybook;
+};
+const deleteMoneybook = async req => {
+  /**
+   * @author 오주환
+   * @version 1.0 22.07.07 가계부 상세내역 삭제
+   */
+  const { moneybook_id } = req.params;
+  const currentTime = getCurrentTime();
+
+  const moneybook = await moneybookDetail.update(
+    {
+      deletedAt: currentTime,
+    },
+    {
+      where: { id: moneybook_id },
+    },
+  );
+
+  return moneybook;
+};
+const recoverMoneybook = async req => {
+  /**
+   * @author 오주환
+   * @version 1.0 22.07.07 가계부 상세내역 복구
+   */
+  const { moneybook_id } = req.params;
+  console.log(moneybook_id);
+
+  const moneybook = await moneybookDetail.restore({
+    where: { id: moneybook_id },
+  });
+
+  return moneybook;
+};
 /**
  * @author 박성용
  * @version 1.0 22.7.6 최초 작성
  */
-const anotherUsersMoneybooks = async (query) => {
+const anotherUsersMoneybooks = async query => {
   const type = parseInt(query.type, 10);
   const moneybook_id = parseInt(query.moneybook_id, 10);
   try {
@@ -147,7 +180,7 @@ const anotherUsersMoneybooks = async (query) => {
       ],
     });
     let anotherMoneybookList = [];
-    getAnotherMoneybooks.forEach((data) => {
+    getAnotherMoneybooks.forEach(data => {
       let otherUserMoneybooksData = {
         moneybook_detail_id: data.dataValues.id,
         type: data.dataValues.money_type,
@@ -166,5 +199,10 @@ const anotherUsersMoneybooks = async (query) => {
 };
 
 export default {
+  getMoneybookDetail,
   anotherUsersMoneybooks,
+  recoverMoneybook,
+  createMoneybook,
+  updateMoneybook,
+  deleteMoneybook,
 };

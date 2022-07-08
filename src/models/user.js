@@ -31,12 +31,13 @@ class User extends Model {
         timestamps: true, //createdAt, updatedAt 컬럼 자동 추가
         paranoid: true, //deletedAt 컬럼 자동 추가
         underscored: true, //컬럼명 스네이크 형식으로 변경
-      }
+      },
     );
   }
 
   static associate(db) {
     db.User.hasMany(db.Moneybook, { foreignKey: "user_id", allowNull: false });
+    db.User.hasMany(db.Comment, { foreignKey: "user_id", allowNull: false });
   }
 }
 

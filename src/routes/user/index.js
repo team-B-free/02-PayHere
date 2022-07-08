@@ -9,7 +9,7 @@ const router = Router();
 router.post(
   "/token-resign",
   validate(validator.resignToken),
-  userController.resignToken
+  userController.resignToken,
 );
 router.post("/login", validate(validator.login), userController.login);
 router.post("/signup", validate(validator.signUp), userController.signUp);
@@ -28,13 +28,13 @@ router.patch(
   "/",
   validate(validator.editUser),
   authJWT,
-  userController.editUser
+  userController.editUser,
 ); // 회원정보 수정
 router.delete(
   "/",
   validate(validator.deleteUser),
   authJWT,
-  userController.deleteUser
+  userController.deleteUser,
 ); // 회원 삭제
 
 export default router;

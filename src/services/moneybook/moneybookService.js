@@ -9,7 +9,7 @@ import { response, errResponse } from "../../utils/response.js";
  * @author 박성용
  * @version 1.0 22.7.6 최초 작성
  */
-const mbtiMoneybook = async (mbti) => {
+const mbtiMoneybook = async mbti => {
   try {
     const getUsersMbti = await Moneybook.findAll({
       where: { is_shared: "Y" },
@@ -25,7 +25,7 @@ const mbtiMoneybook = async (mbti) => {
       ],
     });
     let mbtiDataList = [];
-    getUsersMbti.forEach((data) => {
+    getUsersMbti.forEach(data => {
       let mbtiData = {
         moneybook_id: data.dataValues.id,
         title: data.dataValues.title,
@@ -47,7 +47,7 @@ const mbtiMoneybook = async (mbti) => {
  * @author 박성용
  * @version 1.0 22.7.6 최초 작성
  */
-const deleteMoneybook = async (moneybook_id) => {
+const deleteMoneybook = async moneybook_id => {
   try {
     await Moneybook.destroy({
       where: { id: moneybook_id },
@@ -63,7 +63,7 @@ const deleteMoneybook = async (moneybook_id) => {
  * @author 박성용
  * @version 1.0 22.7.6 최초 작성
  */
-const restoreMoneybook = async (moneybook_id) => {
+const restoreMoneybook = async moneybook_id => {
   try {
     await Moneybook.restore({
       where: { id: moneybook_id },
@@ -75,36 +75,33 @@ const restoreMoneybook = async (moneybook_id) => {
   }
 };
 
-const moneybookService = {
-  updateMoneybook: async (req) => {
-    /**
-     * @author 오주환
-     * @version 1.0 22.07.06 가계부 수정
-     */
-    const { moneybook_id } = req.params;
-    const { title, is_shared } = req.body;
-    const authorization = req.header("Authorization");
+const updateMoneybook = async req => {
+  /**
+   * @author 오주환
+   * @version 1.0 22.07.06 가계부 수정
+   */
+  const { moneybook_id } = req.params;
+  const { title, is_shared } = req.body;
+  const authorization = req.header("authorization");
 
-    if (authorization === undefined) {
-      return -1;
-    }
+  if (authorization === undefined) {
+    return -1;
+  }
 
-    const moneybook = await Moneybook.update(
-      {
-        title,
-        is_shared,
-      },
-      {
-        where: { id: moneybook_id },
-      }
-    );
-    return moneybook;
-  },
+  const moneybook = await Moneybook.update(
+    {
+      title,
+      is_shared,
+    },
+    {
+      where: { id: moneybook_id },
+    },
+  );
+  return moneybook;
 };
-
 export default {
   deleteMoneybook,
   restoreMoneybook,
   mbtiMoneybook,
-  moneybookService,
+  updateMoneybook,
 };

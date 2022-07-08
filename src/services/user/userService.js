@@ -80,8 +80,11 @@ const signUp = async (email, password, nickname) => {
 
     const encryptedPassword = bcrypt.hashSync(password, 10);
 
-
-    const newUser = await User.create({email, password: encryptedPassword, nickname});
+    const newUser = await User.create({
+      email,
+      password: encryptedPassword,
+      nickname,
+    });
     const userId = newUser.id;
 
     const { accessToken, refreshToken } = await signTokens(userId);
@@ -97,7 +100,7 @@ const signUp = async (email, password, nickname) => {
   }
 };
 
-const logout = async (userId) => {
+const logout = async userId => {
   redisClient.del(String(userId));
 
   return [statusCode.OK, response(statusCode.OK, message.SUCCESS)];
@@ -106,7 +109,7 @@ const logout = async (userId) => {
 const resignToken = async (accessToken, refreshToken) => {
   const [result, newAccessToken] = await resignAccessToken(
     accessToken,
-    refreshToken
+    refreshToken,
   );
 
   if (result === resignTokenStatus.RESIGN_ACCESS_TOKEN) {
@@ -124,7 +127,7 @@ const resignToken = async (accessToken, refreshToken) => {
     ];
   }
 };
-const readAllMoneybookByDate = async (req) => {
+const readAllMoneybookByDate = async req => {
   /**
    * @author 오주환
    * @version 1.0 22.07.07 가계부 조회(날짜) 생성
@@ -138,13 +141,13 @@ const readAllMoneybookByDate = async (req) => {
   } else {
     const result = Moneybook.sequelize.query(
       `SELECT id, title, is_shared, view, created_at FROM moneybook WHERE user_id=${userId} AND created_at >= '${startDate}' AND created_at <= '${endDate}' ORDER BY created_at DESC;`,
-      { model: Moneybook }
+      { model: Moneybook },
     );
 
     return result;
   }
 };
-const createMoneybook = async (req) => {
+const createMoneybook = async req => {
   /**
    * @author 오주환
    * @version 1.0 22.07.06 가계부 생성
@@ -168,9 +171,9 @@ const createMoneybook = async (req) => {
  * @author 강채현
  * @version 1.0
  * @param {string} userId userId
- * @returns {array} response 또는 errResponse 객체 
+ * @returns {array} response 또는 errResponse 객체
  */
-const getUser = async (userId) => {
+const getUser = async userId => {
   try {
     const user = await User.findByPk(userId);
 
@@ -200,7 +203,12 @@ const getUser = async (userId) => {
  * @param {string} newPassword 변경할 비밀번호
  * @returns {array<number, response>} response 또는 errResponse 객체
  */
-const editUser = async (userId, newNickname = null, newMbti = null, newPassword = null) => {
+const editUser = async (
+  userId,
+  newNickname = null,
+  newMbti = null,
+  newPassword = null,
+) => {
   const dataToEdit = {
     newNickname,
     newMbti,
@@ -210,11 +218,8 @@ const editUser = async (userId, newNickname = null, newMbti = null, newPassword 
 
   // (DB) USER SELECT query 및 Vaildation
   const [status, result] = await getUser(userId);
-  if(!result.data) {
-    return [
-      status,
-      result
-    ]
+  if (!result.data) {
+    return [status, result];
   }
 
   const user = result.data;
@@ -253,14 +258,11 @@ const editUser = async (userId, newNickname = null, newMbti = null, newPassword 
  * @param {User} user User 객체
  * @returns {array<number, response>} response 또는 errResponse 객체
  */
-const deleteUser = async (userId) => {
+const deleteUser = async userId => {
   // (DB) USER SELECT query 및 Vaildation
   const [status, result] = await getUser(userId);
-  if(!result.data) {
-    return [
-      status,
-      result
-    ]
+  if (!result.data) {
+    return [status, result];
   }
 
   const user = result.data;

@@ -11,7 +11,7 @@ const authJWT = (req, res, next) => {
     return res
       .status(statusCode.UNAUTHORIZED)
       .send(
-        errResponse(statusCode.UNAUTHORIZED, message.NULL_VALUE_ACEESS_TOKEN)
+        errResponse(statusCode.UNAUTHORIZED, message.NULL_VALUE_ACEESS_TOKEN),
       );
   }
 
@@ -27,7 +27,7 @@ const authJWT = (req, res, next) => {
       return res
         .status(statusCode.UNAUTHORIZED)
         .send(
-          errResponse(statusCode.UNAUTHORIZED, message.ACCESS_TOKEN_EXPIRES)
+          errResponse(statusCode.UNAUTHORIZED, message.ACCESS_TOKEN_EXPIRES),
         );
     }
     //검증 실패

@@ -17,11 +17,14 @@ const userController = {
     } = req.body;
 
     // (DB) USER UPDATE query 및 Validation
-    const [ statusCode, result ] = await userService.editUser(userId, newNickName, newMbti, newPassword);
+    const [statusCode, result] = await userService.editUser(
+      userId,
+      newNickName,
+      newMbti,
+      newPassword,
+    );
 
-    return res
-      .status(statusCode)
-      .send(result)
+    return res.status(statusCode).send(result);
   },
 
   /** 회원정보 삭제 API
@@ -35,7 +38,6 @@ const userController = {
 
     return res.status(statusCode).send(result);
   },
-
   login: async (req, res) => {
     const { email, password } = req.body;
     const [statusCode, result] = await userService.login(email, password);
@@ -49,7 +51,7 @@ const userController = {
 
     const [statusCode, result] = await userService.resignToken(
       accessToken,
-      refreshToken
+      refreshToken,
     );
 
     return res.status(statusCode).send(result);
@@ -57,11 +59,10 @@ const userController = {
 
   signUp: async (req, res) => {
     const { email, password, nickname } = req.body;
-
     const [statusCode, result] = await userService.signUp(
       email,
       password,
-      nickname
+      nickname,
     );
 
     return res.status(statusCode).send(result);
@@ -87,7 +88,7 @@ const userController = {
         .send(errResponse(statusCode.UNAUTHORIZED, message.UNAUTHORIZED));
     } else if (moneybook.length === 0) {
       return res.json(
-        response(statusCode.NO_CONTENT, message.NO_CONTENT, moneybook)
+        response(statusCode.NO_CONTENT, message.NO_CONTENT, moneybook),
       );
     } else {
       return res

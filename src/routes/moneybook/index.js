@@ -1,5 +1,6 @@
 import { Router } from "express";
 import moneybookController from "./../../controllers/moneybook/moneybookController.js";
+import commentController from "./../../controllers/comment/commentController.js";
 const router = Router();
 /**
  * @author 오주환
@@ -17,9 +18,15 @@ router.patch("/:moneybook_id", moneybookController.updateMoneybook);
  *  @author 박성용
  *  @version 1.2 22.7.7 {가계부 삭제기능 delete 메서드로 변경}
  */
-
 router.get("/", moneybookController.getMbtiTypeMoneybook);
-router.delete("/:moneybook_id/status/", moneybookController.setDeleteMoneybook);
 router.patch("/recover/:moneybook_id", moneybookController.setRestoreMoneyBook);
+router.delete("/:moneybook_id/status/", moneybookController.setDeleteMoneybook);
+
+//댓글 생성
+router.post("/comments", commentController.createComment);
+//댓글 수정
+router.patch("/comments/:comment_id", commentController.updateComment);
+//댓글 삭제
+router.delete("/comments/:comment_id", commentController.deleteComment);
 
 export default router;
