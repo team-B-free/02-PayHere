@@ -1,5 +1,9 @@
-import Joi from "joi";
+import Joi from 'joi';
 
+/** user Validator
+ * @author 강채현
+ * @version 1.0 22.07.04 user Validator 추가
+ */
 export const login = {
   body: Joi.object({
     email: Joi.string().required(),
@@ -35,7 +39,7 @@ export const editUser = {
     new_nickname: Joi.string(),
     new_mbti: Joi.string(),
     new_password: Joi.string(),
-  }).or("new_nickname", "new_mbti", "new_password"),
+  }).or('new_nickname', 'new_mbti', 'new_password'),
 };
 
 export const deleteUser = {

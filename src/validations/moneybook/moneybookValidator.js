@@ -1,4 +1,4 @@
-import Joi from "joi";
+import Joi from 'joi';
 
 // login: async (req, res) => {
 //     const { email, password } = req.body;
@@ -7,25 +7,34 @@ import Joi from "joi";
 //     return res.status(statusCode).send(result);
 //   },
 
+/** moneybook Validator
+ * @author 강채현
+ * @version 1.0 22.07.04 moneybook Validator 추가
+ */
 export const getMbtiTypeMoneybook = {
   query: Joi.object({
     result: Joi.object.required(),
   }),
 };
 
-export const resignToken = {
-  headers: Joi.object({
-    authorization: Joi.string().required(),
-    refreshtoken: Joi.string().required(),
-  }).options({
-    allowUnknown: true,
+export const setDeleteMoneybook = {
+  params: Joi.object({
+    moneybook_id: Joi.required(),
   }),
 };
 
-export const signUp = {
+export const setRestoreMoneyBook = {
+  params: Joi.object({
+    moneybook_id: Joi.required(),
+  }),
+};
+
+export const updateMoneybook = {
+  params: Joi.object({
+    moneybook_id: Joi.required(),
+  }),
   body: Joi.object({
-    email: Joi.string().required(),
-    password: Joi.string().required(),
-    nickname: Joi.string().required(),
+    title: Joi.string().required(),
+    is_shared: Joi.string().required(),
   }),
 };
