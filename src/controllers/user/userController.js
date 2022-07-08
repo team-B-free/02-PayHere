@@ -1,12 +1,12 @@
-import statusCode from "./../../utils/statusCode.js";
-import message from "./../../utils/responseMessage.js";
-import { errResponse, response } from "./../../utils/response.js";
-import userService from "../../services/user/userService.js";
+import statusCode from './../../utils/statusCode.js';
+import message from './../../utils/responseMessage.js';
+import { errResponse, response } from './../../utils/response.js';
+import userService from '../../services/user/userService.js';
 
 const userController = {
   /** 회원정보 수정 API
    * @author 강채현
-   * @version 1.0
+   * @version 1.0 22.07.04 회원수정 추가
    */
   editUser: async (req, res) => {
     const { userId } = req;
@@ -29,7 +29,7 @@ const userController = {
 
   /** 회원정보 삭제 API
    * @author 강채현
-   * @version 1.0
+   * @version 1.0 22.07.04 회원탈퇴 추가
    */
   deleteUser: async (req, res) => {
     const { userId } = req;
@@ -47,7 +47,7 @@ const userController = {
 
   resignToken: async (req, res) => {
     const { authorization, refreshtoken: refreshToken } = req.headers;
-    const accessToken = authorization.split(" ").reverse()[0];
+    const accessToken = authorization.split(' ').reverse()[0];
 
     const [statusCode, result] = await userService.resignToken(
       accessToken,
