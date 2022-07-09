@@ -13,7 +13,7 @@ import Joi from 'joi';
  */
 export const getMbtiTypeMoneybook = {
   query: Joi.object({
-    result: Joi.object.required(),
+    mbti: Joi.string().required(),
   }),
 };
 

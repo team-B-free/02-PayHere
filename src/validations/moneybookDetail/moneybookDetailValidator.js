@@ -4,7 +4,7 @@ import Joi from 'joi';
  * @author 강채현
  * @version 1.0 22.07.04 moneybookDetail Validator 추가
  */
-export const getMoneybookDetailsetDeleteMoneybook = {
+export const getMoneybookDetail = {
   params: Joi.object({
     moneybook_id: Joi.required(),
   }),
