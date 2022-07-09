@@ -46,7 +46,7 @@ router.delete(
  */
 router.patch(
   '/recovery/:moneybook_id',
-  validate(moneybookDetailController.recoverMoneybook),
+  validate(validator.recoverMoneybook),
   moneybookDetailController.recoverMoneybook,
 );
 router.get(
