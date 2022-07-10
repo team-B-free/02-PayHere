@@ -12,22 +12,33 @@ const createMoneybook = async req => {
   /**
    * @author 오주환
    * @version 1.0 22.07.07 가계부 상세내역
+   *
+   * @author 박성용
+   * @version 1.1 22.07.08
+   * 가계부 상세내역 생성시 현재 로그인 한 유저가 생성한 가계부만 상세 내역 생성 가능
    */
+  const { userId } = req;
   const { moneybook_id } = req.params;
-  console.log(req);
   const { money, memo, money_type, occured_at } = req.body;
-  console.log(req.body);
   const occuredAt = setConvertTime(occured_at);
 
+  const moneyBook = await Moneybook.findOne({
+    where: { id: moneybook_id },
+    attributes: ['title', 'is_shared', 'id', 'user_id'],
+  });
   try {
-    const moneybook = await moneybookDetail.create({
-      money,
-      memo,
-      money_type,
-      moneybook_id,
-      occured_at: occuredAt,
-    });
-    return moneybook;
+    if (moneyBook.user_id === userId) {
+      const moneybook = await moneybookDetail.create({
+        money,
+        memo,
+        money_type,
+        moneybook_id,
+        occured_at: occuredAt,
+      });
+      return moneybook;
+    } else {
+      return errResponse(statusCode.BAD_REQUEST, message.BAD_REQUEST);
+    }
   } catch (error) {
     console.error(error);
   }
@@ -37,67 +48,97 @@ const readAllMoneybook = async req => {
   /**
    * @author 오주환
    * @version 1.0 22.07.07 가계부 상세내역 조회
+   *
+   *  @author 박성용
+   *  @version 1.1 22.07.08
+   *  가계부 상세내역 join 쿼리 수정
+   *  로그인한 유저는 자신의 가계부만 조회 가능
    */
   const { moneybook_id } = req.params;
+  const { userId } = req;
 
   const result = await moneybookDetail.findAll({
     where: {
       moneybook_id,
     },
+    attributes: ['id', 'money_type', 'money', 'memo', 'occured_at'],
     include: [
       {
         model: Moneybook,
         attributes: ['user_id'],
-      },
-      {
-        model: Comment,
-        attributes: ['content'],
+        exclude: ['deleted_at'],
+        required: true,
+        include: [
+          {
+            model: Comment,
+            attributes: ['content'],
+          },
+        ],
       },
     ],
     order: [['createdAt', 'DESC']],
   });
 
   let moneybookDetailInfo = JSON.parse(JSON.stringify(result));
-
   const user_id = moneybookDetailInfo[0].MONEYBOOK.user_id;
 
-  for (let element of moneybookDetailInfo) {
-    delete element.MONEYBOOK;
+  if (userId !== user_id) {
+    return 0;
+  } else {
+    for (let element of moneybookDetailInfo) {
+      delete element.MONEYBOOK;
+    }
+
+    let moneybookDetail1 = {
+      user_id: user_id,
+      moneybookDetailInfo: moneybookDetailInfo,
+    };
+
+    return moneybookDetail1;
   }
-
-  let moneybookDetail = {
-    user_id: user_id,
-    moneybookDetailInfo: moneybookDetailInfo,
-  };
-
-  return moneybookDetail;
 };
 const updateMoneybook = async req => {
   /**
    * @author 오주환
    * @version 1.0 22.07.07 가계부 상세내역 수정
+   *
    */
+
   const { moneybook_id } = req.params;
+  const { userId } = req;
+  console.log(userId, '로그인중');
   const { money, memo, money_type } = req.body;
   const authorization = req.header('Authorization');
+  const moneyBook = await Moneybook.findAll({
+    where: { user_id: userId },
+    attributes: ['id', 'user_id'],
+  });
 
   if (authorization === undefined) {
     return 0;
   }
 
-  const moneybook = await moneybookDetail.update(
-    {
-      money,
-      memo,
-      money_type,
-    },
-    {
-      where: { id: moneybook_id },
-    },
-  );
-
-  return moneybook;
+  try {
+    if (moneyBook.dataValues.id === moneybook_id) {
+      const moneybook = await moneybookDetail.update(
+        {
+          money,
+          memo,
+          money_type,
+        },
+        {
+          where: { id: moneybook_id },
+        },
+      );
+      return moneybook;
+    } else {
+      return errResponse(statusCode.UNAUTHORIZED, message.UNAUTHORIZED);
+    }
+  } catch (err) {
+    return errResponse(statusCode.UNAUTHORIZED, message.UNAUTHORIZED);
+  }
 };
+
 const deleteMoneybook = async req => {
   /**
    * @author 오주환
@@ -121,15 +162,26 @@ const recoverMoneybook = async req => {
   /**
    * @author 오주환
    * @version 1.0 22.07.07 가계부 상세내역 복구
+   * @author 박성용
+   * @version 1.1 22.07.08
+   * 가계부 상세내역 수정시 인증 된 유저가 모든유저의 가계부 복구 가능한 문제 수정
    */
   const { moneybook_id } = req.params;
-  console.log(moneybook_id);
 
-  const moneybook = await moneybookDetail.restore({
+  const moneyBook = await Moneybook.findOne({
     where: { id: moneybook_id },
+    attributes: ['title', 'is_shared', 'id', 'user_id'],
   });
-
-  return moneybook;
+  if (moneyBook === null) {
+    return 0;
+  } else if (moneybook_id !== moneyBook.dataValues.id) {
+    return -1;
+  } else {
+    const moneybook = await moneybookDetail.restore({
+      where: { id: moneybook_id },
+    });
+    return moneybook;
+  }
 };
 
 const anotherUsersMoneybooks = async query => {
@@ -137,10 +189,9 @@ const anotherUsersMoneybooks = async query => {
    * @author 박성용
    * @version 1.0 22.7.6 최초 작성
    */
-  console.log(query);
+
   const type = parseInt(query.type, 10);
   const user_id = query.userId;
-
   try {
     // 2 join 3 table  가게부 상세페이지로 부터 유저의 정보를 가져온다
     const getAnotherMoneybooks = await moneybookDetail.findAll({

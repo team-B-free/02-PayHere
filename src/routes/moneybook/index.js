@@ -1,6 +1,6 @@
-import { Router } from "express";
-import authJWT from "../../middlewares/auth.js";
-import moneybookController from "./../../controllers/moneybook/moneybookController.js";
+import { Router } from 'express';
+import authJWT from '../../middlewares/auth.js';
+import moneybookController from './../../controllers/moneybook/moneybookController.js';
 const router = Router();
 /**
  * @author 오주환
@@ -8,18 +8,18 @@ const router = Router();
  * 문서 구조 작성
  */
 
-router.patch("/:moneybook_id", moneybookController.updateMoneybook);
+router.patch('/:moneybook_id', authJWT, moneybookController.updateMoneybook);
 /**
  * @author 오주환
  * @version 1.0 22.07.06 가계부 수정
  */
 
-router.get("/", moneybookController.getMbtiTypeMoneybook);
+router.get('/', moneybookController.getMbtiTypeMoneybook);
 
 router.delete(
-  "/:moneybook_id",
+  '/:moneybook_id',
   authJWT,
-  moneybookController.setDeleteMoneybook
+  moneybookController.setDeleteMoneybook,
 );
 /**
  *  @author 박성용
@@ -33,9 +33,9 @@ router.delete(
  */
 
 router.patch(
-  "/:moneybook_id/recover",
+  '/:moneybook_id/recover',
   authJWT,
-  moneybookController.setRestoreMoneyBook
+  moneybookController.setRestoreMoneyBook,
 );
 /**
  *  @author 박성용

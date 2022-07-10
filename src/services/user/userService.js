@@ -1,24 +1,24 @@
-import "../../utils/envUtil.js";
-import { logger } from "../../config/winston.js";
-import User from "../../models/user.js";
-import Moneybook from "../../models/moneybook.js";
-import { signTokens } from "../../utils/jwtUtil.js";
-import { response, errResponse } from "../../utils/response.js";
-import message from "../../utils/responseMessage.js";
-import statusCode from "../../utils/statusCode.js";
-import { loginResponse, signUpResponse } from "../../utils/responseData.js";
-import bcrypt from "bcrypt";
-import redisClient from "../../config/redis.js";
-import { resignAccessToken } from "../../utils/jwtUtil.js";
-import { resignTokenStatus } from "../../utils/constants.js";
-import { resignTokenResponse } from "../../utils/responseData.js";
-import { setConvertTimePeriod } from "../../modules/time.js";
+import '../../utils/envUtil.js';
+import { logger } from '../../config/winston.js';
+import User from '../../models/user.js';
+import Moneybook from '../../models/moneybook.js';
+import { signTokens } from '../../utils/jwtUtil.js';
+import { response, errResponse } from '../../utils/response.js';
+import message from '../../utils/responseMessage.js';
+import statusCode from '../../utils/statusCode.js';
+import { loginResponse, signUpResponse } from '../../utils/responseData.js';
+import bcrypt from 'bcrypt';
+import redisClient from '../../config/redis.js';
+import { resignAccessToken } from '../../utils/jwtUtil.js';
+import { resignTokenStatus } from '../../utils/constants.js';
+import { resignTokenResponse } from '../../utils/responseData.js';
+import { setConvertTimePeriod } from '../../modules/time.js';
 
 const login = async (email, password) => {
   try {
     const user = await User.findOne({
       where: { email },
-      attributes: ["id", "password"],
+      attributes: ['id', 'password'],
     });
 
     if (!user) {
@@ -28,7 +28,7 @@ const login = async (email, password) => {
       ];
     }
 
-    const encodedPassword = user.getDataValue("password");
+    const encodedPassword = user.getDataValue('password');
     console.log(encodedPassword);
     console.log(bcrypt.compareSync(password, encodedPassword));
 
@@ -40,7 +40,7 @@ const login = async (email, password) => {
       ];
     }
 
-    const userId = user.getDataValue("id");
+    const userId = user.getDataValue('id');
     const { accessToken, refreshToken } = await signTokens(userId);
     const data = loginResponse(accessToken, refreshToken);
 
@@ -101,7 +101,7 @@ const signUp = async (email, password, nickname, mbti) => {
   }
 };
 
-const logout = async (userId) => {
+const logout = async userId => {
   redisClient.del(String(userId));
 
   return [statusCode.OK, response(statusCode.OK, message.SUCCESS)];
@@ -110,7 +110,7 @@ const logout = async (userId) => {
 const resignToken = async (accessToken, refreshToken) => {
   const [result, newAccessToken] = await resignAccessToken(
     accessToken,
-    refreshToken
+    refreshToken,
   );
 
   if (result === resignTokenStatus.RESIGN_ACCESS_TOKEN) {
@@ -128,7 +128,7 @@ const resignToken = async (accessToken, refreshToken) => {
     ];
   }
 };
-const readAllMoneybookByDate = async (req) => {
+const readAllMoneybookByDate = async req => {
   /**
    * @author 오주환
    * @version 1.0 22.07.07 가계부 조회(날짜) 생성
@@ -145,13 +145,13 @@ const readAllMoneybookByDate = async (req) => {
   } else {
     const result = Moneybook.sequelize.query(
       `SELECT id, title, is_shared, view, created_at, user_id FROM moneybook WHERE (user_id = ${userId}) AND (created_at >= '${startDate}' AND created_at <= date_add('${endDate}',INTERVAL 1 DAY)) ORDER BY created_at ASC;`,
-      { model: Moneybook }
+      { model: Moneybook },
     );
 
     return result;
   }
 };
-const createMoneybook = async (req) => {
+const createMoneybook = async req => {
   /**
    * @author 오주환
    * @version 1.0 22.07.06 가계부 생성
@@ -177,7 +177,7 @@ const createMoneybook = async (req) => {
  * @param {string} userId userId
  * @returns {array} response 또는 errResponse 객체
  */
-const getUser = async (userId) => {
+const getUser = async userId => {
   try {
     const user = await User.findByPk(userId);
 
@@ -211,7 +211,7 @@ const editUser = async (
   userId,
   newNickname = null,
   newMbti = null,
-  newPassword = null
+  newPassword = null,
 ) => {
   const dataToEdit = {
     newNickname,
@@ -219,7 +219,7 @@ const editUser = async (
     newPassword,
   };
   const updatedData = [];
-  console.log("현재유저의 id", userId);
+  console.log('현재유저의 id', userId);
 
   // (DB) USER SELECT query 및 Vaildation
   const [status, result] = await getUser(userId);
@@ -269,7 +269,7 @@ const editUser = async (
  * @param {User} user User 객체
  * @returns {array<number, response>} response 또는 errResponse 객체
  */
-const deleteUser = async (userId) => {
+const deleteUser = async userId => {
   // (DB) USER SELECT query 및 Vaildation
   const [status, result] = await getUser(userId);
   if (!result.data) {

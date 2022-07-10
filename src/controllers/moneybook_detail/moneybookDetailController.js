@@ -8,8 +8,12 @@ const moneybookDetailController = {
     /**
      * @author 오주환
      * @version 1.0 22.07.06 가계부 상세내역 추가
+     *
+     * @author 박성용
+     * @version 1.1 22.07.08
+     * 가계부 상세내역 생성시 현재 로그인 한 유저가 생성한 가계부만 상세 내역 생성 가능
      */
-    console.log(moneybookDetailService);
+
     const moneybook = await moneybookDetailService.createMoneybook(req);
 
     if (moneybook === 0) {
@@ -19,9 +23,7 @@ const moneybookDetailController = {
     } else if (moneybook === undefined) {
       return res.send(errResponse(statusCode.NO_CONTENT, message.NO_CONTENT));
     } else {
-      return res
-        .status(statusCode.CREATED)
-        .send(response(statusCode.CREATED, message.SUCCESS, moneybook));
+      return res.send(moneybook);
     }
   },
 
@@ -73,6 +75,7 @@ const moneybookDetailController = {
     /**
      * @author 오주환
      * @version 1.0 22.07.07 가계부 상세내역 수정
+
      */
     const moneybook = await moneybookDetailService.updateMoneybook(req);
 
@@ -80,12 +83,10 @@ const moneybookDetailController = {
       return res.send(
         errResponse(statusCode.UNAUTHORIZED, message.UNAUTHORIZED),
       );
-    } else if (moneybook[0] === 0) {
+    } else if (moneybook === 0) {
       return res.send(errResponse(statusCode.NO_CONTENT, message.NO_CONTENT));
     } else {
-      return res
-        .status(statusCode.CREATED)
-        .send(response(statusCode.CREATED, message.SUCCESS, moneybook));
+      return res.send(moneybook);
     }
   },
   deleteMoneybook: async (req, res) => {
@@ -94,7 +95,6 @@ const moneybookDetailController = {
      * @version 1.0 22.07.07 가계부 상세내역 삭제
      */
     const moneybook = await moneybookDetailService.deleteMoneybook(req);
-    console.log('moneybook: ', moneybook);
 
     if (moneybook === 0) {
       return res.send(
@@ -112,9 +112,12 @@ const moneybookDetailController = {
     /**
      * @author 오주환
      * @version 1.0 22.07.07 가계부 상세내역 복구
+     *
+     * @author 박성용
+     * @version 1.1 22.07.08
+     * 가계부 상세내역 수정시 인증 된 유저가 모든유저의 가계부 복구 가능한 문제 수정
      */
     const moneybook = await moneybookDetailService.recoverMoneybook(req);
-    console.log('moneybook: ', moneybook);
 
     if (moneybook === 0) {
       return res.send(errResponse(statusCode.NO_CONTENT, message.NO_CONTENT));
@@ -125,7 +128,7 @@ const moneybookDetailController = {
     } else {
       return res
         .status(statusCode.CREATED)
-        .send(response(statusCode.CREATED, message.SUCCESS, moneybook));
+        .send(response(statusCode.CREATED, message.SUCCESS));
     }
   },
 };

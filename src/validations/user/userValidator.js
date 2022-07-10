@@ -1,4 +1,4 @@
-import Joi from "joi";
+import Joi from 'joi';
 
 export const login = {
   body: Joi.object({
@@ -36,7 +36,7 @@ export const editUser = {
     new_nickname: Joi.string(),
     new_mbti: Joi.string(),
     new_password: Joi.string(),
-  }).or("new_nickname", "new_mbti", "new_password"),
+  }).or('new_nickname', 'new_mbti', 'new_password'),
 };
 
 export const deleteUser = {

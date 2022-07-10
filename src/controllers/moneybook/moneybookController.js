@@ -1,33 +1,44 @@
-import moneybookService from "./../../services/moneybook/moneybookService.js";
-import statusCode from "./../../utils/statusCode.js";
-import message from "./../../utils/responseMessage.js";
-import { errResponse, response } from "./../../utils/response.js";
+import moneybookService from './../../services/moneybook/moneybookService.js';
+import statusCode from './../../utils/statusCode.js';
+import message from './../../utils/responseMessage.js';
+import { errResponse, response } from './../../utils/response.js';
 
 const moneybookController = {
-  getMbtiTypeMoneybook: async (req, res) => {
+  getMbtiTypeMoneybook: async (req, res, next) => {
     /**
      * @author 박성용
      * @version 1.0 22.7.6 최초 작성
      *
      * @author 박성용
      * @version 1.1 22.7.7
+     * 코드 리팩터링
+     *
+     *  @author 박성용
+     *  @version 1.2 22.7.8
+     * 가계부 생성시 공유 여부에 따라 mbti별 조회하여가게부를 보여준다
+     *
      */
-    console.log(req);
-    let { mbti } = req.query;
-    // mbti 요청이 비어있으면 BAD_REQUEST 응답
-    if (mbti === "") {
-      return res
-        .status(statusCode.BAD_REQUEST)
-        .send(errResponse(statusCode.BAD_REQUEST, message.BAD_REQUEST));
-    }
-    try {
-      const result = await moneybookService.mbtiMoneybook(mbti);
-      return res.status(result.status).send(result);
-    } catch (err) {
-      console.log(err);
-      return res
-        .status(statusCode.BAD_REQUEST)
-        .send(errResponse(statusCode.BAD_REQUEST, message.BAD_REQUEST));
+    // 쿼리 스트링 요청이 type이라면  쿼리를 getAnotherUsersMoneybook로 보냅니다
+    // eslint-disable-next-line no-prototype-builtins
+    if (req.query.hasOwnProperty('type')) {
+      next();
+    } else {
+      let { mbti } = req.query;
+      // mbti 요청이 비어있으면 BAD_REQUEST 응답
+      if (mbti === '') {
+        return res
+          .status(statusCode.BAD_REQUEST)
+          .send(errResponse(statusCode.BAD_REQUEST, message.BAD_REQUEST));
+      }
+      try {
+        const result = await moneybookService.mbtiMoneybook(mbti);
+        return res.status(result.status).send(result);
+      } catch (err) {
+        console.log(err);
+        return res
+          .status(statusCode.BAD_REQUEST)
+          .send(errResponse(statusCode.BAD_REQUEST, message.BAD_REQUEST));
+      }
     }
   },
 
@@ -47,9 +58,8 @@ const moneybookController = {
     try {
       const delMoneybook = await moneybookService.deleteMoneybook(
         userId,
-        moneybook_id
+        moneybook_id,
       );
-      console.log("결과값", delMoneybook);
       return res.status(delMoneybook.status).send(delMoneybook);
     } catch (err) {
       console.log(err);
@@ -76,7 +86,7 @@ const moneybookController = {
     try {
       const recoverMoneybook = await moneybookService.restoreMoneybook(
         moneybook_id,
-        userId
+        userId,
       );
       return res.status(recoverMoneybook.status).send(recoverMoneybook);
     } catch (err) {
@@ -91,6 +101,9 @@ const moneybookController = {
     /**
      * @author 오주환
      * @version 1.0 22.07.06 가계부 수정
+     *
+     * @author 박성용
+     * @version 1.1 22.07.08 요청 시나리오 별 응답 수정
      */
     const moneybook = await moneybookService.updateMoneybook(req);
 
@@ -98,8 +111,14 @@ const moneybookController = {
       return res
         .status(statusCode.UNAUTHORIZED)
         .send(errResponse(statusCode.UNAUTHORIZED, message.UNAUTHORIZED));
-    } else if (moneybook[0] === 0) {
+    } else if (moneybook === null) {
+      return res.send(errResponse(statusCode.BAD_REQUEST, message.BAD_REQUEST));
+    } else if (moneybook === 0) {
       return res.send(errResponse(statusCode.NO_CONTENT, message.NO_CONTENT));
+    } else if (moneybook === -2) {
+      return res.send(
+        errResponse(statusCode.CONFLICT, message.CONTENTS_CONFLICT),
+      );
     } else {
       return res
         .status(statusCode.CREATED)
